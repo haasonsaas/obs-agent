@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(python3:*)",
+      "Bash(source:*)",
+      "Bash(python test_connection.py:*)",
+      "Bash(lsof:*)",
+      "Bash(python test:*)",
+      "Bash(python:*)",
+      "Bash(mkdir:*)",
+      "Bash(# Move core OBS agent files to src/obs_agent\nmv obs_agent.py src/obs_agent/\nmv advanced_features.py src/obs_agent/\n\n# Move CrewAI files to src/crew\nmv obs_crew_agents.py src/crew/\nmv obs_crew_tools.py src/crew/\nmv obs_crew_examples.py src/crew/\n\n# Move AI agent to src/tools\nmv obs_ai_agent.py src/tools/\n\n# Move examples to examples directory\nmv examples.py examples/\nmv automation_scripts.py examples/\nmv awesome_demo.py examples/demos/\nmv demo.py examples/demos/\nmv run_demo.py examples/demos/\n\n# Move tests to tests directory\nmv test_connection.py tests/\nmv test_interactive.py tests/\nmv test_now.py tests/\nmv simple_test.py tests/\n\n# Move documentation\nmv OBS_SETUP_GUIDE.md docs/\nmv README_CREW.md docs/\n\n# Clean up root by removing old README\nrm README.md)",
+      "Bash(rm:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}
