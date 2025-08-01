@@ -1,5 +1,6 @@
 import asyncio
 from typing import Dict, List, Any, Optional, Tuple
+from obswebsocket import requests
 from .obs_agent import OBSAgent
 import json
 from datetime import datetime, timedelta
