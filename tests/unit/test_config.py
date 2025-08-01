@@ -214,7 +214,7 @@ class TestConfig:
 
     def test_load_default(self, temp_dir):
         """Test loading default configuration."""
-        with patch("obs_agent.config.Path.home", return_value=temp_dir):
+        with patch("pathlib.Path.home", return_value=temp_dir):
             config = Config.load()
             assert config.config_dir == temp_dir / ".obs_agent"
             assert config.cache_dir == temp_dir / ".obs_agent" / "cache"

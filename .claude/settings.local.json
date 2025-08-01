@@ -31,7 +31,9 @@
       "Bash(isort:*)",
       "Bash(autoflake:*)",
       "mcp__filesystem__read_file",
-      "Bash(mypy:*)"
+      "Bash(mypy:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

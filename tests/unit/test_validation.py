@@ -85,9 +85,12 @@ class TestNameValidation:
         """Test source name validation."""
         assert validate_source_name("Microphone") == "Microphone"
         assert validate_source_name("Webcam 1") == "Webcam 1"
+        
+        # Dangerous characters are removed during sanitization
+        assert validate_source_name("Source<>") == "Source"
 
         with pytest.raises(ValidationError, match="Invalid source name"):
-            validate_source_name("Source<>")
+            validate_source_name("Source@#$")
 
     def test_validate_filter_name(self):
         """Test filter name validation."""

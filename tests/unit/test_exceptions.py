@@ -335,10 +335,10 @@ class TestHandleOBSError:
     def test_handle_websocket_errors(self):
         """Test handling WebSocket errors."""
 
-        class WebSocketError(Exception):
+        class MockWebSocketError(Exception):
             pass
 
-        error = WebSocketError("WebSocket connection failed")
+        error = MockWebSocketError("WebSocket connection failed")
         result = handle_obs_error(error)
         assert isinstance(result, WebSocketError)
         assert "WebSocket error" in str(result)
