@@ -30,7 +30,8 @@
       "Bash(black:*)",
       "Bash(isort:*)",
       "Bash(autoflake:*)",
-      "mcp__filesystem__read_file"
+      "mcp__filesystem__read_file",
+      "Bash(mypy:*)"
     ],
     "deny": []
   }

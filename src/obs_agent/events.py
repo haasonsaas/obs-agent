@@ -573,6 +573,35 @@ class EventHandler:
         logger.info(f"Loaded {len(events)} events from {file_path}")
         return events
 
+    async def wait_for_event(self, event_name: str, timeout: float = 30.0) -> Optional[BaseEvent]:
+        """
+        Wait for a specific event.
+
+        Args:
+            event_name: The event name to wait for
+            timeout: Maximum time to wait
+
+        Returns:
+            The event data if received, None if timeout
+        """
+        future: asyncio.Future[BaseEvent] = asyncio.Future()
+        
+        def handler(event: BaseEvent) -> None:
+            if not future.done():
+                future.set_result(event)
+        
+        # Register temporary handler
+        self._handlers[event_name].append(handler)
+        
+        try:
+            return await asyncio.wait_for(future, timeout=timeout)
+        except asyncio.TimeoutError:
+            return None
+        finally:
+            # Remove temporary handler
+            if handler in self._handlers[event_name]:
+                self._handlers[event_name].remove(handler)
+
 
 # Middleware Examples
 

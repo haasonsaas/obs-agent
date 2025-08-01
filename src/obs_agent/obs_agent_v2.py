@@ -8,7 +8,7 @@ for controlling OBS Studio via WebSocket.
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TypedDict, Union
+from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, TypedDict, Union
 
 from obswebsocket import requests
 
@@ -511,7 +511,7 @@ class OBSAgent:
         if volume_db is None and volume_mul is None:
             raise ValidationError("Must specify either volume_db or volume_mul")
 
-        params = {"inputName": source_name}
+        params: Dict[str, Any] = {"inputName": source_name}
 
         if volume_db is not None:
             params["inputVolumeDb"] = validate_volume(volume_db, as_db=True)
@@ -809,7 +809,7 @@ class OBSAgent:
         if format not in ["png", "jpg", "jpeg", "bmp"]:
             raise ValidationError(f"Invalid image format: {format}")
 
-        params = {"sourceName": source_name, "imageFilePath": str(file_path), "imageFormat": format}
+        params: Dict[str, Any] = {"sourceName": source_name, "imageFilePath": str(file_path), "imageFormat": format}
 
         if width:
             params["imageWidth"] = width
@@ -839,7 +839,7 @@ class OBSAgent:
         """
         return self.connection.event_handler
 
-    def on(self, event_type: Union[str, type], *filters):
+    def on(self, event_type: Union[str, type], *filters) -> Callable:
         """
         Decorator for registering event handlers.
 
@@ -871,7 +871,7 @@ class OBSAgent:
 
 # Convenience function for creating OBS Agent with context manager
 @asynccontextmanager
-async def create_obs_agent(config: Optional[Config] = None):
+async def create_obs_agent(config: Optional[Config] = None) -> AsyncGenerator["OBSAgent", None]:
     """
     Create an OBS Agent with automatic connection management.
 
