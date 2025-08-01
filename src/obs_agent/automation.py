@@ -21,6 +21,7 @@ Example usage:
 """
 
 import asyncio
+import logging
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -28,7 +29,6 @@ from datetime import datetime, timedelta
 from enum import Enum, auto
 from functools import wraps
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Set, Type, Union
-import logging
 
 from .events import BaseEvent
 from .logging import get_logger

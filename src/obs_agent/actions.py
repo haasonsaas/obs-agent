@@ -15,8 +15,8 @@ Categories:
 import asyncio
 import time
 from datetime import datetime, timedelta
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
 from pathlib import Path
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
 
 from .automation import AutomationContext
 from .events import BaseEvent

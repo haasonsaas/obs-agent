@@ -12,6 +12,8 @@ from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, TypedDic
 
 from obswebsocket import requests
 
+from .actions import ActionBuilder, SmartActions
+from .automation import AutomationDecorator, AutomationEngine
 from .config import Config, get_config
 from .connection import ConnectionManager, get_connection_manager
 from .events import EventHandler
@@ -23,8 +25,6 @@ from .exceptions import (
     StreamNotActiveError,
     ValidationError,
 )
-from .automation import AutomationEngine, AutomationDecorator
-from .actions import ActionBuilder, SmartActions
 from .logging import (
     get_logger,
     log_performance,
