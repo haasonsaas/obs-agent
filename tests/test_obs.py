@@ -54,6 +54,7 @@ def test_basic_connection(host="localhost", port=4455, password=""):
 
 import pytest
 
+
 @pytest.mark.skip(reason="Interactive test - requires user input")
 def test_interactive():
     """Interactive connection test with user input"""

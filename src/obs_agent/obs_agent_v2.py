@@ -102,7 +102,7 @@ class OBSAgent:
         self._source_cache: Optional[List[SourceInfo]] = None
         self._cache_timestamp: Optional[datetime] = None
         self._cache_ttl = 60.0  # Cache TTL in seconds
-        
+
         # Automation system
         self._automation_engine: Optional[AutomationEngine] = None
         self._automation_decorator: Optional[AutomationDecorator] = None

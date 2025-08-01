@@ -21,7 +21,6 @@ Example usage:
 """
 
 import asyncio
-import time
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -31,7 +30,7 @@ from functools import wraps
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Set, Type, Union
 import logging
 
-from .events import BaseEvent, EventHandler
+from .events import BaseEvent
 from .logging import get_logger
 
 logger = get_logger(__name__)
@@ -443,7 +442,7 @@ class AutomationEngine:
             logger.info(f"Executing automation rule: {rule.name}")
 
             # Execute the action
-            result = await rule.action(context)
+            await rule.action(context)
 
             # Update execution record
             execution.completed_at = datetime.now()
