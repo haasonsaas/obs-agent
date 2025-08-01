@@ -28,6 +28,32 @@ from .validation import (
     validate_source_name,
 )
 
+# Event system
+from .events import (
+    EventHandler,
+    EventSubscription,
+    BaseEvent,
+    EventPriority,
+    EventCategory,
+    # Event classes
+    CurrentProgramSceneChanged,
+    SceneCreated,
+    SceneRemoved,
+    SceneNameChanged,
+    InputCreated,
+    InputRemoved,
+    InputMuteStateChanged,
+    InputVolumeChanged,
+    StreamStateChanged,
+    RecordStateChanged,
+    ExitStarted,
+    StudioModeStateChanged,
+    # Middleware
+    logging_middleware,
+    error_handling_middleware,
+    performance_middleware,
+)
+
 __all__ = [
     # Version info
     "__version__",
@@ -72,4 +98,27 @@ __all__ = [
     "setup_logging",
     "get_logger",
     "log_context",
+    # Event system
+    "EventHandler",
+    "EventSubscription",
+    "BaseEvent",
+    "EventPriority",
+    "EventCategory",
+    # Event classes
+    "CurrentProgramSceneChanged",
+    "SceneCreated",
+    "SceneRemoved",
+    "SceneNameChanged",
+    "InputCreated",
+    "InputRemoved",
+    "InputMuteStateChanged",
+    "InputVolumeChanged",
+    "StreamStateChanged",
+    "RecordStateChanged",
+    "ExitStarted",
+    "StudioModeStateChanged",
+    # Middleware
+    "logging_middleware",
+    "error_handling_middleware",
+    "performance_middleware",
 ]

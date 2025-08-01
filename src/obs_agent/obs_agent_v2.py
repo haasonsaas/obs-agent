@@ -14,6 +14,16 @@ from obswebsocket import requests
 
 from .config import Config, get_config
 from .connection import ConnectionManager, get_connection_manager
+from .events import (
+    EventHandler,
+    EventSubscription,
+    SceneCreated,
+    SceneRemoved,
+    CurrentProgramSceneChanged,
+    StreamStateChanged,
+    RecordStateChanged,
+    InputMuteStateChanged,
+)
 from .exceptions import (
     RecordingAlreadyActiveError,
     RecordingNotActiveError,
@@ -822,27 +832,38 @@ class OBSAgent:
 
     # Event Handling
 
-    def register_event_handler(self, event_type: str, handler: Callable) -> None:
+    @property
+    def events(self) -> EventHandler:
         """
-        Register an event handler.
+        Get the event handler for registering event callbacks.
+        
+        Usage:
+            @agent.events.on(SceneCreated)
+            async def on_scene_created(event: SceneCreated):
+                print(f"Scene created: {event.scene_name}")
+                
+            @agent.events.on("InputMuteStateChanged", lambda e: e.input_name == "Mic")
+            async def on_mic_mute(event: InputMuteStateChanged):
+                print(f"Mic muted: {event.input_muted}")
+        """
+        return self.connection.event_handler
 
+    def on(self, event_type: Union[str, type], *filters):
+        """
+        Decorator for registering event handlers.
+        
         Args:
-            event_type: The event type to handle
-            handler: The handler function
+            event_type: Event type or class to handle
+            *filters: Optional filter functions
+            
+        Usage:
+            @agent.on(CurrentProgramSceneChanged)
+            async def scene_changed(event: CurrentProgramSceneChanged):
+                print(f"Scene changed to: {event.scene_name}")
         """
-        self.connection.register_event_handler(event_type, handler)
+        return self.events.on(event_type, *filters)
 
-    def unregister_event_handler(self, event_type: str, handler: Callable) -> None:
-        """
-        Unregister an event handler.
-
-        Args:
-            event_type: The event type
-            handler: The handler function to remove
-        """
-        self.connection.unregister_event_handler(event_type, handler)
-
-    async def wait_for_event(self, event_type: str, timeout: float = 30.0) -> Optional[Any]:
+    async def wait_for_event(self, event_type: Union[str, type], timeout: float = 30.0) -> Optional[Any]:
         """
         Wait for a specific event.
 
@@ -853,7 +874,8 @@ class OBSAgent:
         Returns:
             The event data if received, None if timeout
         """
-        return await self.connection.wait_for_event(event_type, timeout)
+        event_name = event_type if isinstance(event_type, str) else event_type.__name__
+        return await self.connection.event_handler.wait_for_event(event_name, timeout)
 
 
 # Convenience function for creating OBS Agent with context manager

@@ -20,6 +20,7 @@ from obswebsocket import obsws, requests
 
 from .config import OBSConfig, get_config
 from .exceptions import AuthenticationError, ConnectionError, RequestTimeoutError, handle_obs_error
+from .events import EventHandler, parse_event, BaseEvent
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,8 @@ class ConnectionManager:
         self._reconnecting: bool = False
         self._shutdown: bool = False
         self._stats: ConnectionStats = ConnectionStats()
-        self._event_handlers: Dict[str, List[Callable]] = {}
+        self._event_handler: EventHandler = EventHandler()
+        self._event_task: Optional[asyncio.Task] = None
         self._health_check_task: Optional[asyncio.Task] = None
         self._reconnect_task: Optional[asyncio.Task] = None
         self._connection_lock = asyncio.Lock()
@@ -123,6 +125,12 @@ class ConnectionManager:
                 # Register internal event handlers
                 self._register_internal_handlers()
 
+                # Start event handler
+                await self._event_handler.start()
+                
+                # Start event processing task
+                self._event_task = asyncio.create_task(self._process_websocket_events())
+
                 # Start health check if enabled
                 if get_config().enable_performance_monitoring:
                     self._health_check_task = asyncio.create_task(self._health_check_loop())
@@ -141,7 +149,17 @@ class ConnectionManager:
         async with self._connection_lock:
             self._shutdown = True
 
+            # Stop event handler
+            await self._event_handler.stop()
+
             # Cancel background tasks
+            if self._event_task:
+                self._event_task.cancel()
+                try:
+                    await self._event_task
+                except asyncio.CancelledError:
+                    pass
+                    
             if self._health_check_task:
                 self._health_check_task.cancel()
                 try:
@@ -229,64 +247,33 @@ class ConnectionManager:
 
             raise handle_obs_error(e)
 
-    def register_event_handler(self, event_type: str, handler: Callable) -> None:
-        """
-        Register an event handler.
+    @property
+    def event_handler(self) -> EventHandler:
+        """Get the event handler instance."""
+        return self._event_handler
 
-        Args:
-            event_type: The event type to handle
-            handler: The handler function
-        """
-        if event_type not in self._event_handlers:
-            self._event_handlers[event_type] = []
-
-        self._event_handlers[event_type].append(handler)
-        logger.debug(f"Registered handler for event: {event_type}")
-
-    def unregister_event_handler(self, event_type: str, handler: Callable) -> None:
-        """
-        Unregister an event handler.
-
-        Args:
-            event_type: The event type
-            handler: The handler function to remove
-        """
-        if event_type in self._event_handlers:
+    async def _process_websocket_events(self) -> None:
+        """Process incoming WebSocket events."""
+        while self._connected and not self._shutdown:
             try:
-                self._event_handlers[event_type].remove(handler)
-                logger.debug(f"Unregistered handler for event: {event_type}")
-            except ValueError:
-                pass
-
-    async def wait_for_event(self, event_type: str, timeout: float = 30.0) -> Optional[Any]:
-        """
-        Wait for a specific event.
-
-        Args:
-            event_type: The event type to wait for
-            timeout: Maximum time to wait
-
-        Returns:
-            The event data if received, None if timeout
-        """
-        event_received = asyncio.Event()
-        event_data = None
-
-        def handler(event):
-            nonlocal event_data
-            event_data = event
-            event_received.set()
-
-        self.register_event_handler(event_type, handler)
-
-        try:
-            await asyncio.wait_for(event_received.wait(), timeout)
-            return event_data
-        except asyncio.TimeoutError:
-            logger.warning(f"Timeout waiting for event: {event_type}")
-            return None
-        finally:
-            self.unregister_event_handler(event_type, handler)
+                # This would need to be implemented based on the actual obs-websocket-py API
+                # For now, this is a placeholder showing the pattern
+                # In reality, you'd register a callback with the WebSocket connection
+                
+                # Example pattern:
+                # raw_event = await self._connection.get_event()  # This doesn't exist in current API
+                # if raw_event:
+                #     event = parse_event(raw_event)
+                #     if event:
+                #         self._stats.total_events += 1
+                #         await self._event_handler.emit(event)
+                
+                await asyncio.sleep(0.1)  # Placeholder
+                
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error processing WebSocket events: {e}")
 
     def _register_internal_handlers(self) -> None:
         """Register internal event handlers."""

@@ -29,7 +29,8 @@
       "Bash(git restore:*)",
       "Bash(black:*)",
       "Bash(isort:*)",
-      "Bash(autoflake:*)"
+      "Bash(autoflake:*)",
+      "mcp__filesystem__read_file"
     ],
     "deny": []
   }
