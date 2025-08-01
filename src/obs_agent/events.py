@@ -585,14 +585,14 @@ class EventHandler:
             The event data if received, None if timeout
         """
         future: asyncio.Future[BaseEvent] = asyncio.Future()
-        
+
         def handler(event: BaseEvent) -> None:
             if not future.done():
                 future.set_result(event)
-        
+
         # Register temporary handler
         self._handlers[event_name].append(handler)
-        
+
         try:
             return await asyncio.wait_for(future, timeout=timeout)
         except asyncio.TimeoutError:

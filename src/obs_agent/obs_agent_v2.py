@@ -23,6 +23,8 @@ from .exceptions import (
     StreamNotActiveError,
     ValidationError,
 )
+from .automation import AutomationEngine, AutomationDecorator
+from .actions import ActionBuilder, SmartActions
 from .logging import (
     get_logger,
     log_performance,
@@ -100,6 +102,12 @@ class OBSAgent:
         self._source_cache: Optional[List[SourceInfo]] = None
         self._cache_timestamp: Optional[datetime] = None
         self._cache_ttl = 60.0  # Cache TTL in seconds
+        
+        # Automation system
+        self._automation_engine: Optional[AutomationEngine] = None
+        self._automation_decorator: Optional[AutomationDecorator] = None
+        self._action_builder: Optional[ActionBuilder] = None
+        self._smart_actions: Optional[SmartActions] = None
 
     async def __aenter__(self) -> "OBSAgent":
         """Async context manager entry."""
@@ -867,6 +875,92 @@ class OBSAgent:
         """
         event_name = event_type if isinstance(event_type, str) else event_type.__name__
         return await self.connection.event_handler.wait_for_event(event_name, timeout)
+
+    # Automation System Properties
+
+    @property
+    def automation(self) -> AutomationDecorator:
+        """
+        Get the automation decorator for creating automation rules.
+
+        Usage:
+            @agent.automation.when(InputMuteStateChanged, lambda e: e.input_name == "Microphone")
+            @agent.automation.after_delay(5.0)
+            async def switch_to_brb(context):
+                await agent.set_scene("BRB Screen")
+        """
+        if self._automation_decorator is None:
+            self._init_automation()
+        return self._automation_decorator
+
+    @property
+    def actions(self) -> ActionBuilder:
+        """
+        Get the action builder for creating complex automation actions.
+
+        Usage:
+            action = await agent.actions.scene("Main").mute("Microphone", True).wait(2.0).build()
+        """
+        if self._action_builder is None:
+            self._init_automation()
+        return ActionBuilder(self)  # Always return a fresh builder
+
+    @property
+    def smart_actions(self) -> SmartActions:
+        """
+        Get the smart actions collection for pre-built automation patterns.
+
+        Usage:
+            brb_action = agent.smart_actions.create_brb_automation()
+        """
+        if self._smart_actions is None:
+            self._init_automation()
+        return self._smart_actions
+
+    def _init_automation(self) -> None:
+        """Initialize the automation system."""
+        if self._automation_engine is None:
+            self._automation_engine = AutomationEngine(self)
+            self._automation_decorator = AutomationDecorator(self._automation_engine)
+            self._action_builder = ActionBuilder(self)
+            self._smart_actions = SmartActions(self)
+
+    def start_automation(self) -> None:
+        """Start the automation engine."""
+        if self._automation_engine is None:
+            self._init_automation()
+        self._automation_engine.start()
+        self.logger.info("Automation engine started")
+
+    def stop_automation(self) -> None:
+        """Stop the automation engine."""
+        if self._automation_engine:
+            self._automation_engine.stop()
+            self.logger.info("Automation engine stopped")
+
+    def get_automation_stats(self) -> Dict[str, Any]:
+        """Get automation engine statistics."""
+        if self._automation_engine:
+            return self._automation_engine.get_stats()
+        return {}
+
+    def get_automation_rule_status(self, rule_name: str) -> Optional[Dict[str, Any]]:
+        """Get status of a specific automation rule."""
+        if self._automation_engine:
+            return self._automation_engine.get_rule_status(rule_name)
+        return None
+
+    def enable_automation_rule(self, rule_name: str) -> bool:
+        """Enable an automation rule."""
+        if self._automation_engine:
+            return self._automation_engine.enable_rule(rule_name)
+        return False
+
+    def disable_automation_rule(self, rule_name: str) -> bool:
+        """Disable an automation rule."""
+        if self._automation_engine:
+            return self._automation_engine.disable_rule(rule_name)
+        return False
 
 
 # Convenience function for creating OBS Agent with context manager

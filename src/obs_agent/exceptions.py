@@ -202,17 +202,19 @@ def handle_obs_error(error: Exception) -> OBSAgentError:
     # Scene errors
     if "scene" in error_str:
         if "not found" in error_str or "does not exist" in error_str:
-            # Try to extract scene name
+            # Try to extract scene name (from original error, not lowercased)
             scene_name = "unknown"
-            if "'" in error_str:
-                parts = error_str.split("'")
+            original_error_str = str(error)
+            if "'" in original_error_str:
+                parts = original_error_str.split("'")
                 if len(parts) >= 2:
                     scene_name = parts[1]
             return SceneNotFoundError(scene_name)
         elif "already exists" in error_str:
             scene_name = "unknown"
-            if "'" in error_str:
-                parts = error_str.split("'")
+            original_error_str = str(error)
+            if "'" in original_error_str:
+                parts = original_error_str.split("'")
                 if len(parts) >= 2:
                     scene_name = parts[1]
             return SceneAlreadyExistsError(scene_name)
@@ -220,16 +222,19 @@ def handle_obs_error(error: Exception) -> OBSAgentError:
     # Source errors
     if "source" in error_str or "input" in error_str:
         if "not found" in error_str or "does not exist" in error_str:
+            # Try to extract source name (from original error, not lowercased)
             source_name = "unknown"
-            if "'" in error_str:
-                parts = error_str.split("'")
+            original_error_str = str(error)
+            if "'" in original_error_str:
+                parts = original_error_str.split("'")
                 if len(parts) >= 2:
                     source_name = parts[1]
             return SourceNotFoundError(source_name)
         elif "already exists" in error_str:
             source_name = "unknown"
-            if "'" in error_str:
-                parts = error_str.split("'")
+            original_error_str = str(error)
+            if "'" in original_error_str:
+                parts = original_error_str.split("'")
                 if len(parts) >= 2:
                     source_name = parts[1]
             return SourceAlreadyExistsError(source_name)
