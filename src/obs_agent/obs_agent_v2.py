@@ -8,22 +8,13 @@ for controlling OBS Studio via WebSocket.
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, TypedDict, Union
+from typing import Any, Dict, List, Optional, TypedDict, Union
 
 from obswebsocket import requests
 
 from .config import Config, get_config
 from .connection import ConnectionManager, get_connection_manager
-from .events import (
-    EventHandler,
-    EventSubscription,
-    SceneCreated,
-    SceneRemoved,
-    CurrentProgramSceneChanged,
-    StreamStateChanged,
-    RecordStateChanged,
-    InputMuteStateChanged,
-)
+from .events import EventHandler
 from .exceptions import (
     RecordingAlreadyActiveError,
     RecordingNotActiveError,
@@ -836,12 +827,12 @@ class OBSAgent:
     def events(self) -> EventHandler:
         """
         Get the event handler for registering event callbacks.
-        
+
         Usage:
             @agent.events.on(SceneCreated)
             async def on_scene_created(event: SceneCreated):
                 print(f"Scene created: {event.scene_name}")
-                
+
             @agent.events.on("InputMuteStateChanged", lambda e: e.input_name == "Mic")
             async def on_mic_mute(event: InputMuteStateChanged):
                 print(f"Mic muted: {event.input_muted}")
@@ -851,11 +842,11 @@ class OBSAgent:
     def on(self, event_type: Union[str, type], *filters):
         """
         Decorator for registering event handlers.
-        
+
         Args:
             event_type: Event type or class to handle
             *filters: Optional filter functions
-            
+
         Usage:
             @agent.on(CurrentProgramSceneChanged)
             async def scene_changed(event: CurrentProgramSceneChanged):

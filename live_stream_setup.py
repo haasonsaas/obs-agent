@@ -4,12 +4,13 @@ Live Programming Stream Setup - Complete setup and streaming assistance
 """
 
 import asyncio
-import sys
 import os
-from obswebsocket import obsws, requests
-from dotenv import load_dotenv
+import sys
 import time
 from datetime import datetime
+
+from dotenv import load_dotenv
+from obswebsocket import obsws, requests
 
 load_dotenv()
 

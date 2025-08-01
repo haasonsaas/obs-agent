@@ -4,10 +4,11 @@ Beautiful OBS Setup - Create stunning professional scenes with gradients, animat
 """
 
 import asyncio
-from obswebsocket import obsws, requests
-from dotenv import load_dotenv
-import os
 import json
+import os
+
+from dotenv import load_dotenv
+from obswebsocket import obsws, requests
 
 load_dotenv()
 

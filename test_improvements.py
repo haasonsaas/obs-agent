@@ -6,8 +6,8 @@ This script tests the new features without requiring OBS to be running.
 """
 
 import asyncio
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add src to path for testing
@@ -16,10 +16,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 # Test imports
 print("Testing imports...")
 try:
-    from obs_agent import (
-        OBSAgentV2, Config, OBSConfig, ValidationError,
-        validate_scene_name, setup_logging, get_logger
-    )
+    from obs_agent import Config, OBSAgentV2, OBSConfig, ValidationError, get_logger, setup_logging, validate_scene_name
     print("✅ All imports successful")
 except ImportError as e:
     print(f"❌ Import failed: {e}")
@@ -105,11 +102,8 @@ def test_exceptions():
     """Test exception hierarchy."""
     print("\n=== Testing Exceptions ===")
     
-    from obs_agent import (
-        OBSAgentError, SceneNotFoundError, ConnectionError,
-        handle_obs_error
-    )
-    
+    from obs_agent import ConnectionError, OBSAgentError, SceneNotFoundError, handle_obs_error
+
     # Test exception hierarchy
     scene_error = SceneNotFoundError("Test Scene")
     assert isinstance(scene_error, OBSAgentError)
@@ -130,7 +124,7 @@ def test_logging():
     print("\n=== Testing Logging ===")
     
     from obs_agent import log_context
-    
+
     # Test basic logging
     logger.info("Test info message")
     logger.warning("Test warning message")

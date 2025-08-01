@@ -25,7 +25,6 @@ from typing import (
     Dict,
     List,
     Optional,
-    Set,
     Type,
     TypeVar,
     Union,
@@ -497,17 +496,17 @@ class EventHandler:
 
     async def _execute_with_middleware(self, event: BaseEvent, handler: EventHandlerType):
         """Execute handler with middleware chain."""
-        
+
         async def execute_handler():
             """Execute the actual handler."""
             if asyncio.iscoroutinefunction(handler):
                 await handler(event)
             else:
                 handler(event)
-        
+
         # Build middleware chain from right to left
         next_handler = execute_handler
-        
+
         for middleware in reversed(self._middleware):
             # Use default parameters to capture the current values
             def make_middleware_wrapper(mw, next_h):
@@ -516,10 +515,11 @@ class EventHandler:
                         await mw(event, next_h)
                     else:
                         mw(event, next_h)
+
                 return middleware_wrapper
-            
+
             next_handler = make_middleware_wrapper(middleware, next_handler)
-        
+
         # Execute the chain
         await next_handler()
 
@@ -566,9 +566,7 @@ class EventHandler:
             event_class = EVENT_CLASSES.get(event_type)
             if event_class:
                 # Reconstruct event
-                event = event_class(
-                    **{k: v for k, v in item.items() if k not in ["event_type", "timestamp"]}
-                )
+                event = event_class(**{k: v for k, v in item.items() if k not in ["event_type", "timestamp"]})
                 event.timestamp = datetime.fromisoformat(item["timestamp"])
                 events.append(event)
 
@@ -602,12 +600,12 @@ async def error_handling_middleware(event: BaseEvent, next_handler: Callable):
 async def performance_middleware(event: BaseEvent, next_handler: Callable):
     """Measure event handler performance."""
     start_time = time.time()
-    
+
     if asyncio.iscoroutinefunction(next_handler):
         await next_handler()
     else:
         next_handler()
-    
+
     elapsed = time.time() - start_time
     if elapsed > 0.1:  # Log slow handlers
         logger.warning(f"Slow handler for {event.event_type}: {elapsed:.3f}s")

@@ -4,7 +4,8 @@ Setup configuration for OBS Agent.
 
 import os
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 # Read the README file
 here = Path(__file__).parent.absolute()

@@ -5,8 +5,10 @@ Quick launcher for programming livestream setup
 
 import asyncio
 import sys
-from examples.programming_stream import ProgrammingStreamSetup
+
 from dotenv import load_dotenv
+
+from examples.programming_stream import ProgrammingStreamSetup
 
 load_dotenv()
 

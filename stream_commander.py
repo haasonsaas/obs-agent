@@ -4,13 +4,14 @@ Stream Commander - Real-time stream control with hotkeys
 """
 
 import asyncio
-import keyboard
-import sys
-from obswebsocket import obsws, requests
-from dotenv import load_dotenv
 import os
+import sys
 import threading
 import time
+
+import keyboard
+from dotenv import load_dotenv
+from obswebsocket import obsws, requests
 
 load_dotenv()
 

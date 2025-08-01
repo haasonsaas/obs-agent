@@ -4,6 +4,30 @@ from .__version__ import __author__, __description__, __email__, __version__
 from .advanced_features import AdvancedOBSAgent, AdvancedOBSController
 from .config import Config, LoggingConfig, OBSConfig, StreamingConfig, get_config, set_config
 from .connection import ConnectionManager, get_connection_manager, obs_connection
+
+# Event system
+from .events import (  # Event classes; Middleware
+    BaseEvent,
+    CurrentProgramSceneChanged,
+    EventCategory,
+    EventHandler,
+    EventPriority,
+    EventSubscription,
+    ExitStarted,
+    InputCreated,
+    InputMuteStateChanged,
+    InputRemoved,
+    InputVolumeChanged,
+    RecordStateChanged,
+    SceneCreated,
+    SceneNameChanged,
+    SceneRemoved,
+    StreamStateChanged,
+    StudioModeStateChanged,
+    error_handling_middleware,
+    logging_middleware,
+    performance_middleware,
+)
 from .exceptions import (
     AuthenticationError,
     ConnectionError,
@@ -26,32 +50,6 @@ from .validation import (
     validate_scene_name,
     validate_settings,
     validate_source_name,
-)
-
-# Event system
-from .events import (
-    EventHandler,
-    EventSubscription,
-    BaseEvent,
-    EventPriority,
-    EventCategory,
-    # Event classes
-    CurrentProgramSceneChanged,
-    SceneCreated,
-    SceneRemoved,
-    SceneNameChanged,
-    InputCreated,
-    InputRemoved,
-    InputMuteStateChanged,
-    InputVolumeChanged,
-    StreamStateChanged,
-    RecordStateChanged,
-    ExitStarted,
-    StudioModeStateChanged,
-    # Middleware
-    logging_middleware,
-    error_handling_middleware,
-    performance_middleware,
 )
 
 __all__ = [

@@ -13,14 +13,14 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from threading import Lock
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Optional
 
 import obswebsocket.exceptions
 from obswebsocket import obsws, requests
 
 from .config import OBSConfig, get_config
+from .events import EventHandler
 from .exceptions import AuthenticationError, ConnectionError, RequestTimeoutError, handle_obs_error
-from .events import EventHandler, parse_event, BaseEvent
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +127,7 @@ class ConnectionManager:
 
                 # Start event handler
                 await self._event_handler.start()
-                
+
                 # Start event processing task
                 self._event_task = asyncio.create_task(self._process_websocket_events())
 
@@ -159,7 +159,7 @@ class ConnectionManager:
                     await self._event_task
                 except asyncio.CancelledError:
                     pass
-                    
+
             if self._health_check_task:
                 self._health_check_task.cancel()
                 try:
@@ -259,7 +259,7 @@ class ConnectionManager:
                 # This would need to be implemented based on the actual obs-websocket-py API
                 # For now, this is a placeholder showing the pattern
                 # In reality, you'd register a callback with the WebSocket connection
-                
+
                 # Example pattern:
                 # raw_event = await self._connection.get_event()  # This doesn't exist in current API
                 # if raw_event:
@@ -267,9 +267,9 @@ class ConnectionManager:
                 #     if event:
                 #         self._stats.total_events += 1
                 #         await self._event_handler.emit(event)
-                
+
                 await asyncio.sleep(0.1)  # Placeholder
-                
+
             except asyncio.CancelledError:
                 break
             except Exception as e:

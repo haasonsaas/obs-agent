@@ -4,10 +4,11 @@ Quick Programming Stream Setup - Simple version that works immediately
 """
 
 import asyncio
-import sys
 import os
-from obswebsocket import obsws, requests
+import sys
+
 from dotenv import load_dotenv
+from obswebsocket import obsws, requests
 
 load_dotenv()
 

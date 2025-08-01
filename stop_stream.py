@@ -3,9 +3,10 @@
 Emergency Stream Stopper - Stop streaming immediately
 """
 
-from obswebsocket import obsws, requests
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+from obswebsocket import obsws, requests
 
 load_dotenv()
 
