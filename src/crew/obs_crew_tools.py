@@ -6,7 +6,6 @@ from crewai_tools import BaseTool
 from pydantic import BaseModel, Field
 
 
-
 class OBSConnection:
     """Singleton OBS connection manager"""
 

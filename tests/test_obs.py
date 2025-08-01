@@ -8,10 +8,10 @@ import getpass
 import os
 import sys
 
-from obswebsocket import obsws, requests
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from dotenv import load_dotenv
+from obswebsocket import obsws, requests
 
 from src.obs_agent import OBSAgent
 

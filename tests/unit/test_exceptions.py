@@ -2,7 +2,6 @@
 Unit tests for exceptions module.
 """
 
-
 from obs_agent.exceptions import (
     AuthenticationError,
     ConfigurationError,

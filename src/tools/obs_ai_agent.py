@@ -9,7 +9,6 @@ from typing import Any, Dict, List, Optional, Tuple
 from advanced_features import AdvancedOBSAgent, AdvancedOBSController
 
 
-
 class StreamGoal(Enum):
     MAINTAIN_QUALITY = "maintain_quality"
     MAXIMIZE_ENGAGEMENT = "maximize_engagement"

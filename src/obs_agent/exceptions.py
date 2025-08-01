@@ -27,25 +27,20 @@ class ConnectionError(OBSAgentError):
     """Raised when connection to OBS fails or is lost."""
 
 
-
 class AuthenticationError(ConnectionError):
     """Raised when authentication with OBS fails."""
-
 
 
 class ConfigurationError(OBSAgentError):
     """Raised when configuration is invalid or missing."""
 
 
-
 class ValidationError(OBSAgentError):
     """Raised when input validation fails."""
 
 
-
 class SceneError(OBSAgentError):
     """Base exception for scene-related errors."""
-
 
 
 class SceneNotFoundError(SceneError):
@@ -68,7 +63,6 @@ class SourceError(OBSAgentError):
     """Base exception for source-related errors."""
 
 
-
 class SourceNotFoundError(SourceError):
     """Raised when a requested source doesn't exist."""
 
@@ -89,35 +83,28 @@ class StreamingError(OBSAgentError):
     """Base exception for streaming-related errors."""
 
 
-
 class StreamAlreadyActiveError(StreamingError):
     """Raised when trying to start a stream that's already active."""
-
 
 
 class StreamNotActiveError(StreamingError):
     """Raised when trying to stop a stream that's not active."""
 
 
-
 class RecordingError(OBSAgentError):
     """Base exception for recording-related errors."""
-
 
 
 class RecordingAlreadyActiveError(RecordingError):
     """Raised when trying to start a recording that's already active."""
 
 
-
 class RecordingNotActiveError(RecordingError):
     """Raised when trying to stop a recording that's not active."""
 
 
-
 class FilterError(OBSAgentError):
     """Base exception for filter-related errors."""
-
 
 
 class FilterNotFoundError(FilterError):
@@ -148,7 +135,6 @@ class WebSocketError(OBSAgentError):
     """Base exception for WebSocket-related errors."""
 
 
-
 class RequestTimeoutError(WebSocketError):
     """Raised when a WebSocket request times out."""
 
@@ -164,15 +150,12 @@ class InvalidRequestError(WebSocketError):
     """Raised when an invalid request is made to OBS."""
 
 
-
 class PermissionError(OBSAgentError):
     """Raised when an operation is not permitted."""
 
 
-
 class ResourceLimitError(OBSAgentError):
     """Raised when a resource limit is exceeded."""
-
 
 
 class PerformanceWarning(OBSAgentError):
