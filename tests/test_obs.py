@@ -3,15 +3,17 @@
 Consolidated OBS connection and functionality tests
 """
 
-import sys
-import os
 import asyncio
 import getpass
+import os
+import sys
+
 from obswebsocket import obsws, requests
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.obs_agent import OBSAgent
 from dotenv import load_dotenv
+
+from src.obs_agent import OBSAgent
 
 load_dotenv()
 

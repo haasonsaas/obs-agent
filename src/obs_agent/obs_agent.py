@@ -1,10 +1,10 @@
 import asyncio
 import json
-from typing import Dict, List, Optional, Any, Callable
-from obswebsocket import obsws, requests, events
 import logging
 from datetime import datetime
-from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
+
+from obswebsocket import obsws, requests
 
 
 class OBSAgent:

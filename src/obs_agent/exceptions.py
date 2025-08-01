@@ -5,7 +5,7 @@ This module defines all custom exceptions used throughout the OBS Agent,
 providing better error handling and clearer error messages.
 """
 
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 
 class OBSAgentError(Exception):
@@ -26,31 +26,26 @@ class OBSAgentError(Exception):
 class ConnectionError(OBSAgentError):
     """Raised when connection to OBS fails or is lost."""
 
-    pass
 
 
 class AuthenticationError(ConnectionError):
     """Raised when authentication with OBS fails."""
 
-    pass
 
 
 class ConfigurationError(OBSAgentError):
     """Raised when configuration is invalid or missing."""
 
-    pass
 
 
 class ValidationError(OBSAgentError):
     """Raised when input validation fails."""
 
-    pass
 
 
 class SceneError(OBSAgentError):
     """Base exception for scene-related errors."""
 
-    pass
 
 
 class SceneNotFoundError(SceneError):
@@ -72,7 +67,6 @@ class SceneAlreadyExistsError(SceneError):
 class SourceError(OBSAgentError):
     """Base exception for source-related errors."""
 
-    pass
 
 
 class SourceNotFoundError(SourceError):
@@ -94,43 +88,36 @@ class SourceAlreadyExistsError(SourceError):
 class StreamingError(OBSAgentError):
     """Base exception for streaming-related errors."""
 
-    pass
 
 
 class StreamAlreadyActiveError(StreamingError):
     """Raised when trying to start a stream that's already active."""
 
-    pass
 
 
 class StreamNotActiveError(StreamingError):
     """Raised when trying to stop a stream that's not active."""
 
-    pass
 
 
 class RecordingError(OBSAgentError):
     """Base exception for recording-related errors."""
 
-    pass
 
 
 class RecordingAlreadyActiveError(RecordingError):
     """Raised when trying to start a recording that's already active."""
 
-    pass
 
 
 class RecordingNotActiveError(RecordingError):
     """Raised when trying to stop a recording that's not active."""
 
-    pass
 
 
 class FilterError(OBSAgentError):
     """Base exception for filter-related errors."""
 
-    pass
 
 
 class FilterNotFoundError(FilterError):
@@ -160,7 +147,6 @@ class FilterAlreadyExistsError(FilterError):
 class WebSocketError(OBSAgentError):
     """Base exception for WebSocket-related errors."""
 
-    pass
 
 
 class RequestTimeoutError(WebSocketError):
@@ -177,19 +163,16 @@ class RequestTimeoutError(WebSocketError):
 class InvalidRequestError(WebSocketError):
     """Raised when an invalid request is made to OBS."""
 
-    pass
 
 
 class PermissionError(OBSAgentError):
     """Raised when an operation is not permitted."""
 
-    pass
 
 
 class ResourceLimitError(OBSAgentError):
     """Raised when a resource limit is exceeded."""
 
-    pass
 
 
 class PerformanceWarning(OBSAgentError):

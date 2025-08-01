@@ -2,13 +2,14 @@
 Unit tests for configuration module.
 """
 
-import pytest
-import os
 import json
+import os
 from pathlib import Path
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
 
-from obs_agent.config import OBSConfig, StreamingConfig, LoggingConfig, Config, get_config, set_config
+import pytest
+
+from obs_agent.config import Config, LoggingConfig, OBSConfig, StreamingConfig, get_config, set_config
 
 
 class TestOBSConfig:

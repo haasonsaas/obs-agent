@@ -2,25 +2,26 @@
 Unit tests for input validation module.
 """
 
-import pytest
 from pathlib import Path
 
+import pytest
+
 from obs_agent.validation import (
-    sanitize_string,
-    validate_scene_name,
-    validate_source_name,
-    validate_filter_name,
-    validate_port,
-    validate_host,
-    validate_file_path,
-    validate_color,
-    validate_resolution,
-    validate_volume,
-    validate_settings,
-    validate_transition_duration,
-    validate_fps,
-    validate_bitrate,
     ValidationError,
+    sanitize_string,
+    validate_bitrate,
+    validate_color,
+    validate_file_path,
+    validate_filter_name,
+    validate_fps,
+    validate_host,
+    validate_port,
+    validate_resolution,
+    validate_scene_name,
+    validate_settings,
+    validate_source_name,
+    validate_transition_duration,
+    validate_volume,
 )
 
 

@@ -1,17 +1,16 @@
-from crewai import Agent, Crew, Task, Process
+
+from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from typing import List, Dict, Any, Optional
-from obs_crew_tools import (
-    OBSSceneTool,
-    OBSAudioTool,
-    OBSRecordingTool,
-    OBSStreamingTool,
-    OBSStatsTool,
-    OBSFilterTool,
-    OBSSnapshotTool,
-)
-import os
 from dotenv import load_dotenv
+from obs_crew_tools import (
+    OBSAudioTool,
+    OBSFilterTool,
+    OBSRecordingTool,
+    OBSSceneTool,
+    OBSSnapshotTool,
+    OBSStatsTool,
+    OBSStreamingTool,
+)
 
 load_dotenv()
 

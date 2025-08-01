@@ -7,19 +7,19 @@ connection pooling capabilities.
 """
 
 import asyncio
-import time
 import logging
-from typing import Optional, Dict, Any, Callable, List
-from threading import Lock
+import time
 from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta
+from threading import Lock
+from typing import Any, Callable, Dict, List, Optional
 
-from obswebsocket import obsws, requests, events
 import obswebsocket.exceptions
+from obswebsocket import obsws, requests
 
-from .config import get_config, OBSConfig
-from .exceptions import ConnectionError, AuthenticationError, OBSAgentError, handle_obs_error, RequestTimeoutError
+from .config import OBSConfig, get_config
+from .exceptions import AuthenticationError, ConnectionError, RequestTimeoutError, handle_obs_error
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +131,7 @@ class ConnectionManager:
 
             except obswebsocket.exceptions.ConnectionFailure as e:
                 self._handle_connection_error(e)
-            except obswebsocket.exceptions.MessageTimeout as e:
+            except obswebsocket.exceptions.MessageTimeout:
                 raise RequestTimeoutError("Connection", self._config.timeout)
             except Exception as e:
                 raise handle_obs_error(e)
@@ -216,7 +216,7 @@ class ConnectionManager:
 
             return response
 
-        except obswebsocket.exceptions.MessageTimeout as e:
+        except obswebsocket.exceptions.MessageTimeout:
             self._stats.failed_requests += 1
             raise RequestTimeoutError(type(request).__name__, timeout or self._config.timeout)
         except Exception as e:

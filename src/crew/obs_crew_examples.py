@@ -1,10 +1,9 @@
 import asyncio
-from crewai import Agent, Task, Crew, Process
+
+from crewai import Agent, Crew, Process, Task
+from dotenv import load_dotenv
 from obs_crew_agents import OBSStreamCrew, PodcastCrew, TutorialCrew
 from obs_crew_tools import OBSConnection
-import os
-from dotenv import load_dotenv
-from typing import Dict, Any
 
 load_dotenv()
 
@@ -106,7 +105,7 @@ async def emergency_stream_recovery():
     print("=" * 50)
 
     # Create a custom emergency crew
-    from obs_crew_tools import OBSSceneTool, OBSAudioTool, OBSStreamingTool, OBSStatsTool, OBSFilterTool
+    from obs_crew_tools import OBSAudioTool, OBSSceneTool, OBSStatsTool, OBSStreamingTool
 
     # Emergency Response Agent
     emergency_agent = Agent(
@@ -167,13 +166,13 @@ async def collaborative_production_crew():
     print("=" * 50)
 
     from obs_crew_tools import (
-        OBSSceneTool,
         OBSAudioTool,
-        OBSStreamingTool,
-        OBSRecordingTool,
-        OBSStatsTool,
         OBSFilterTool,
+        OBSRecordingTool,
+        OBSSceneTool,
         OBSSnapshotTool,
+        OBSStatsTool,
+        OBSStreamingTool,
     )
 
     # Create specialized agents for a production

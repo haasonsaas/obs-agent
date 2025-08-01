@@ -5,16 +5,15 @@ This module provides structured logging with proper formatting,
 log rotation, and different handlers for various use cases.
 """
 
+import json
 import logging
 import logging.handlers
 import sys
-import json
-from typing import Optional, Dict, Any, Union
-from pathlib import Path
-from datetime import datetime
 from contextlib import contextmanager
+from datetime import datetime
+from typing import Any, Dict, Optional
 
-from .config import get_config, LoggingConfig
+from .config import LoggingConfig, get_config
 
 
 class ColoredFormatter(logging.Formatter):

@@ -5,46 +5,38 @@ This is the main OBS Agent class that provides a high-level interface
 for controlling OBS Studio via WebSocket.
 """
 
-import asyncio
-from typing import Dict, List, Optional, Any, Callable, TypedDict, Union
-from pathlib import Path
-from datetime import datetime
 from contextlib import asynccontextmanager
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, TypedDict, Union
 
 from obswebsocket import requests
 
-from .config import get_config, Config
-from .connection import get_connection_manager, ConnectionManager
+from .config import Config, get_config
+from .connection import ConnectionManager, get_connection_manager
 from .exceptions import (
-    OBSAgentError,
-    SceneNotFoundError,
-    SourceNotFoundError,
-    StreamAlreadyActiveError,
-    StreamNotActiveError,
     RecordingAlreadyActiveError,
     RecordingNotActiveError,
+    SceneNotFoundError,
+    StreamAlreadyActiveError,
+    StreamNotActiveError,
     ValidationError,
-)
-from .validation import (
-    validate_scene_name,
-    validate_source_name,
-    validate_filter_name,
-    validate_volume,
-    validate_file_path,
-    validate_settings,
-    validate_transition_duration,
-    validate_resolution,
 )
 from .logging import (
     get_logger,
-    setup_logging,
     log_performance,
-    log_obs_request,
-    log_obs_response,
-    log_obs_error,
+    log_recording_status,
     log_scene_change,
     log_stream_status,
-    log_recording_status,
+    setup_logging,
+)
+from .validation import (
+    validate_file_path,
+    validate_scene_name,
+    validate_settings,
+    validate_source_name,
+    validate_transition_duration,
+    validate_volume,
 )
 
 

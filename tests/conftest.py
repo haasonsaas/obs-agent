@@ -2,15 +2,16 @@
 Pytest configuration and fixtures for OBS Agent tests.
 """
 
-import pytest
 import asyncio
-from typing import AsyncGenerator, Generator, Dict, Any
-from unittest.mock import Mock, MagicMock, AsyncMock, patch
-from pathlib import Path
-import tempfile
 import shutil
+import tempfile
+from pathlib import Path
+from typing import Any, AsyncGenerator, Dict, Generator
+from unittest.mock import MagicMock, patch
 
-from obs_agent.config import Config, OBSConfig, StreamingConfig, LoggingConfig
+import pytest
+
+from obs_agent.config import Config, LoggingConfig, OBSConfig, StreamingConfig
 from obs_agent.connection import ConnectionManager
 from obs_agent.obs_agent_v2 import OBSAgent
 

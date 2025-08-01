@@ -6,11 +6,10 @@ to prevent security issues and ensure data integrity.
 """
 
 import re
-from typing import Any, Dict, List, Optional, Union
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 from .exceptions import ValidationError
-
 
 # Regular expressions for validation
 SCENE_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9\s\-_\.]+$")
@@ -66,7 +65,7 @@ def sanitize_string(
 
     # Validate against pattern if provided
     if pattern and not pattern.match(value):
-        raise ValidationError(f"Value contains invalid characters")
+        raise ValidationError("Value contains invalid characters")
 
     return value
 
@@ -227,7 +226,7 @@ def validate_file_path(path: Union[str, Path], must_exist: bool = False, allow_r
 
     # Prevent directory traversal
     try:
-        resolved = path_obj.resolve()
+        path_obj.resolve()
         if allow_relative:
             # For relative paths, ensure they don't go outside current directory
             if ".." in path_obj.parts:

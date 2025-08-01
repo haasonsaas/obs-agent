@@ -5,12 +5,12 @@ This module provides centralized configuration with validation,
 environment variable support, and type safety.
 """
 
-import os
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Any
-from pathlib import Path
 import json
 import logging
+import os
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
