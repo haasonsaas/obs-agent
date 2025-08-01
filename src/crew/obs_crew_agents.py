@@ -2,8 +2,13 @@ from crewai import Agent, Crew, Task, Process
 from crewai.project import CrewBase, agent, crew, task
 from typing import List, Dict, Any, Optional
 from obs_crew_tools import (
-    OBSSceneTool, OBSAudioTool, OBSRecordingTool, 
-    OBSStreamingTool, OBSStatsTool, OBSFilterTool, OBSSnapshotTool
+    OBSSceneTool,
+    OBSAudioTool,
+    OBSRecordingTool,
+    OBSStreamingTool,
+    OBSStatsTool,
+    OBSFilterTool,
+    OBSSnapshotTool,
 )
 import os
 from dotenv import load_dotenv
@@ -13,7 +18,7 @@ load_dotenv()
 
 class OBSStreamCrew(CrewBase):
     """OBS Stream Management Crew"""
-    
+
     def __init__(self):
         super().__init__()
         # Initialize all tools
@@ -24,7 +29,7 @@ class OBSStreamCrew(CrewBase):
         self.stats_tool = OBSStatsTool()
         self.filter_tool = OBSFilterTool()
         self.snapshot_tool = OBSSnapshotTool()
-    
+
     @agent
     def stream_director(self) -> Agent:
         """Director agent that manages scenes and overall stream flow"""
@@ -37,9 +42,9 @@ class OBSStreamCrew(CrewBase):
             about when to transition.""",
             tools=[self.scene_tool, self.snapshot_tool],
             verbose=True,
-            allow_delegation=True
+            allow_delegation=True,
         )
-    
+
     @agent
     def audio_engineer(self) -> Agent:
         """Audio engineer agent that manages all audio sources"""
@@ -52,9 +57,9 @@ class OBSStreamCrew(CrewBase):
             for different types of content.""",
             tools=[self.audio_tool, self.filter_tool],
             verbose=True,
-            allow_delegation=False
+            allow_delegation=False,
         )
-    
+
     @agent
     def technical_producer(self) -> Agent:
         """Technical producer that handles recording/streaming and monitors performance"""
@@ -66,9 +71,9 @@ class OBSStreamCrew(CrewBase):
             and quickly respond to technical issues. You prioritize stream stability and quality.""",
             tools=[self.recording_tool, self.streaming_tool, self.stats_tool],
             verbose=True,
-            allow_delegation=True
+            allow_delegation=True,
         )
-    
+
     @agent
     def quality_controller(self) -> Agent:
         """Quality control agent that monitors and maintains stream quality"""
@@ -81,9 +86,9 @@ class OBSStreamCrew(CrewBase):
             maintain optimal quality.""",
             tools=[self.stats_tool, self.snapshot_tool],
             verbose=True,
-            allow_delegation=True
+            allow_delegation=True,
         )
-    
+
     @agent
     def creative_producer(self) -> Agent:
         """Creative producer that manages visual effects and filters"""
@@ -96,9 +101,9 @@ class OBSStreamCrew(CrewBase):
             You balance creativity with performance.""",
             tools=[self.filter_tool, self.scene_tool],
             verbose=True,
-            allow_delegation=False
+            allow_delegation=False,
         )
-    
+
     @task
     def monitor_stream_health_task(self) -> Task:
         """Continuously monitor stream health and report issues"""
@@ -112,9 +117,9 @@ class OBSStreamCrew(CrewBase):
             
             Provide a comprehensive health report and any recommended actions.""",
             expected_output="Stream health report with metrics and recommendations",
-            agent=self.quality_controller()
+            agent=self.quality_controller(),
         )
-    
+
     @task
     def balance_audio_task(self) -> Task:
         """Balance all audio sources for optimal sound"""
@@ -128,9 +133,9 @@ class OBSStreamCrew(CrewBase):
             
             Target: Clear, balanced audio without clipping or being too quiet.""",
             expected_output="Audio balance report with adjustments made",
-            agent=self.audio_engineer()
+            agent=self.audio_engineer(),
         )
-    
+
     @task
     def optimize_scene_task(self) -> Task:
         """Optimize current scene for performance and quality"""
@@ -144,9 +149,9 @@ class OBSStreamCrew(CrewBase):
             
             Balance visual quality with system performance.""",
             expected_output="Scene optimization report with actions taken",
-            agent=self.creative_producer()
+            agent=self.creative_producer(),
         )
-    
+
     @task
     def manage_recording_task(self) -> Task:
         """Manage recording based on current needs"""
@@ -160,9 +165,9 @@ class OBSStreamCrew(CrewBase):
             
             Ensure high-quality recording without interruptions.""",
             expected_output="Recording management report",
-            agent=self.technical_producer()
+            agent=self.technical_producer(),
         )
-    
+
     @task
     def coordinate_stream_task(self) -> Task:
         """Coordinate all aspects of the stream"""
@@ -177,13 +182,9 @@ class OBSStreamCrew(CrewBase):
             Create a cohesive streaming experience.""",
             expected_output="Stream coordination summary and action plan",
             agent=self.stream_director(),
-            context=[
-                self.monitor_stream_health_task(),
-                self.balance_audio_task(),
-                self.optimize_scene_task()
-            ]
+            context=[self.monitor_stream_health_task(), self.balance_audio_task(), self.optimize_scene_task()],
         )
-    
+
     @crew
     def streaming_crew(self) -> Crew:
         """Create the streaming management crew"""
@@ -193,30 +194,30 @@ class OBSStreamCrew(CrewBase):
                 self.audio_engineer(),
                 self.technical_producer(),
                 self.quality_controller(),
-                self.creative_producer()
+                self.creative_producer(),
             ],
             tasks=[
                 self.monitor_stream_health_task(),
                 self.balance_audio_task(),
                 self.optimize_scene_task(),
                 self.manage_recording_task(),
-                self.coordinate_stream_task()
+                self.coordinate_stream_task(),
             ],
             process=Process.sequential,
-            verbose=True
+            verbose=True,
         )
 
 
 class PodcastCrew(CrewBase):
     """Specialized crew for podcast recording"""
-    
+
     def __init__(self):
         super().__init__()
         self.audio_tool = OBSAudioTool()
         self.recording_tool = OBSRecordingTool()
         self.scene_tool = OBSSceneTool()
         self.filter_tool = OBSFilterTool()
-    
+
     @agent
     def podcast_producer(self) -> Agent:
         """Podcast producer that manages the recording session"""
@@ -227,9 +228,9 @@ class PodcastCrew(CrewBase):
             hundreds of episodes. You know how to set up audio for clarity, manage 
             multiple microphones, and ensure consistent quality throughout the recording.""",
             tools=[self.audio_tool, self.recording_tool, self.scene_tool],
-            verbose=True
+            verbose=True,
         )
-    
+
     @agent
     def podcast_audio_specialist(self) -> Agent:
         """Specialist focused on podcast audio quality"""
@@ -241,9 +242,9 @@ class PodcastCrew(CrewBase):
             consistent levels between hosts and guests. You apply professional audio 
             processing to achieve radio-quality sound.""",
             tools=[self.audio_tool, self.filter_tool],
-            verbose=True
+            verbose=True,
         )
-    
+
     @task
     def setup_podcast_audio_task(self) -> Task:
         """Set up optimal audio for podcast recording"""
@@ -258,9 +259,9 @@ class PodcastCrew(CrewBase):
             
             Goal: Broadcast-quality audio ready for recording.""",
             expected_output="Audio setup report with all optimizations applied",
-            agent=self.podcast_audio_specialist()
+            agent=self.podcast_audio_specialist(),
         )
-    
+
     @task
     def manage_podcast_recording_task(self) -> Task:
         """Manage the podcast recording session"""
@@ -275,36 +276,30 @@ class PodcastCrew(CrewBase):
             Deliver professional podcast recording.""",
             expected_output="Podcast recording status and quality report",
             agent=self.podcast_producer(),
-            context=[self.setup_podcast_audio_task()]
+            context=[self.setup_podcast_audio_task()],
         )
-    
+
     @crew
     def podcast_crew(self) -> Crew:
         """Create the podcast recording crew"""
         return Crew(
-            agents=[
-                self.podcast_producer(),
-                self.podcast_audio_specialist()
-            ],
-            tasks=[
-                self.setup_podcast_audio_task(),
-                self.manage_podcast_recording_task()
-            ],
+            agents=[self.podcast_producer(), self.podcast_audio_specialist()],
+            tasks=[self.setup_podcast_audio_task(), self.manage_podcast_recording_task()],
             process=Process.sequential,
-            verbose=True
+            verbose=True,
         )
 
 
 class TutorialCrew(CrewBase):
     """Specialized crew for tutorial/screencast recording"""
-    
+
     def __init__(self):
         super().__init__()
         self.scene_tool = OBSSceneTool()
         self.recording_tool = OBSRecordingTool()
         self.filter_tool = OBSFilterTool()
         self.audio_tool = OBSAudioTool()
-    
+
     @agent
     def tutorial_director(self) -> Agent:
         """Director specialized in tutorial content"""
@@ -315,9 +310,9 @@ class TutorialCrew(CrewBase):
             how to structure tutorials for maximum clarity, when to switch between screen 
             and camera views, and how to maintain viewer engagement while teaching.""",
             tools=[self.scene_tool, self.recording_tool],
-            verbose=True
+            verbose=True,
         )
-    
+
     @agent
     def tutorial_technician(self) -> Agent:
         """Technical specialist for tutorial setup"""
@@ -328,9 +323,9 @@ class TutorialCrew(CrewBase):
             You ensure screen recordings are crisp, audio is clear, and any webcam 
             footage is properly set up with good lighting and framing.""",
             tools=[self.filter_tool, self.audio_tool],
-            verbose=True
+            verbose=True,
         )
-    
+
     @task
     def setup_tutorial_environment_task(self) -> Task:
         """Set up optimal environment for tutorial recording"""
@@ -345,9 +340,9 @@ class TutorialCrew(CrewBase):
             
             Create professional tutorial recording environment.""",
             expected_output="Tutorial environment setup report",
-            agent=self.tutorial_technician()
+            agent=self.tutorial_technician(),
         )
-    
+
     @task
     def record_tutorial_task(self) -> Task:
         """Manage tutorial recording session"""
@@ -362,30 +357,24 @@ class TutorialCrew(CrewBase):
             Deliver high-quality educational content.""",
             expected_output="Tutorial recording report with file location",
             agent=self.tutorial_director(),
-            context=[self.setup_tutorial_environment_task()]
+            context=[self.setup_tutorial_environment_task()],
         )
-    
+
     @crew
     def tutorial_crew(self) -> Crew:
         """Create the tutorial recording crew"""
         return Crew(
-            agents=[
-                self.tutorial_director(),
-                self.tutorial_technician()
-            ],
-            tasks=[
-                self.setup_tutorial_environment_task(),
-                self.record_tutorial_task()
-            ],
+            agents=[self.tutorial_director(), self.tutorial_technician()],
+            tasks=[self.setup_tutorial_environment_task(), self.record_tutorial_task()],
             process=Process.sequential,
-            verbose=True
+            verbose=True,
         )
 
 
 # Utility function to run crews
 async def run_obs_crew(crew_type: str = "streaming", **kwargs):
     """Run a specific OBS crew"""
-    
+
     if crew_type == "streaming":
         crew = OBSStreamCrew()
         result = crew.streaming_crew().kickoff(inputs=kwargs)
@@ -397,14 +386,14 @@ async def run_obs_crew(crew_type: str = "streaming", **kwargs):
         result = crew.tutorial_crew().kickoff(inputs=kwargs)
     else:
         raise ValueError(f"Unknown crew type: {crew_type}")
-    
+
     return result
 
 
 # Example usage
 if __name__ == "__main__":
     import asyncio
-    
+
     # Example: Run streaming crew
     result = asyncio.run(run_obs_crew("streaming"))
     print(result)

@@ -14,7 +14,20 @@
       "Bash(rm:*)",
       "Bash(gh repo create:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__read_multiple_files",
+      "Bash(ls:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(flake8:*)",
+      "Bash(git restore:*)",
+      "Bash(black:*)"
     ],
     "deny": []
   }

@@ -33,20 +33,13 @@ def test_config() -> Config:
             password="test_password",
             timeout=5.0,
             reconnect_interval=1.0,
-            max_reconnect_attempts=2
+            max_reconnect_attempts=2,
         ),
-        streaming=StreamingConfig(
-            default_bitrate=2500,
-            default_fps=30,
-            default_resolution="1920x1080"
-        ),
-        logging=LoggingConfig(
-            level="DEBUG",
-            file_path=None
-        ),
+        streaming=StreamingConfig(default_bitrate=2500, default_fps=30, default_resolution="1920x1080"),
+        logging=LoggingConfig(level="DEBUG", file_path=None),
         enable_auto_reconnect=False,
         enable_event_logging=False,
-        enable_performance_monitoring=False
+        enable_performance_monitoring=False,
     )
 
 
@@ -61,16 +54,16 @@ def temp_dir() -> Generator[Path, None, None]:
 @pytest.fixture
 def mock_obsws():
     """Mock obs-websocket connection."""
-    with patch('obs_agent.connection.obsws') as mock:
+    with patch("obs_agent.connection.obsws") as mock:
         # Create mock instance
         mock_instance = MagicMock()
         mock.return_value = mock_instance
-        
+
         # Mock connection methods
         mock_instance.connect = MagicMock()
         mock_instance.disconnect = MagicMock()
         mock_instance.call = MagicMock()
-        
+
         yield mock_instance
 
 
@@ -87,12 +80,13 @@ def mock_connection_manager(mock_obsws):
 @pytest.fixture
 async def mock_obs_agent(test_config, mock_connection_manager) -> AsyncGenerator[OBSAgent, None]:
     """Create mock OBS Agent."""
-    with patch('obs_agent.obs_agent_v2.get_connection_manager', return_value=mock_connection_manager):
+    with patch("obs_agent.obs_agent_v2.get_connection_manager", return_value=mock_connection_manager):
         agent = OBSAgent(test_config)
         yield agent
 
 
 # Mock responses for common OBS requests
+
 
 @pytest.fixture
 def mock_version_response():
@@ -102,7 +96,7 @@ def mock_version_response():
         "obsVersion": "29.0.0",
         "obsWebSocketVersion": "5.1.0",
         "platform": "macos",
-        "platformDescription": "macOS 13.0"
+        "platformDescription": "macOS 13.0",
     }
     return response
 
@@ -117,8 +111,8 @@ def mock_scene_list_response():
         "scenes": [
             {"sceneName": "Scene 1", "sceneIndex": 0},
             {"sceneName": "Scene 2", "sceneIndex": 1},
-            {"sceneName": "Scene 3", "sceneIndex": 2}
-        ]
+            {"sceneName": "Scene 3", "sceneIndex": 2},
+        ],
     }
     return response
 
@@ -129,21 +123,9 @@ def mock_source_list_response():
     response = MagicMock()
     response.datain = {
         "inputs": [
-            {
-                "inputName": "Microphone",
-                "inputKind": "wasapi_input_capture",
-                "inputSettings": {"device_id": "default"}
-            },
-            {
-                "inputName": "Webcam",
-                "inputKind": "dshow_input",
-                "inputSettings": {"video_device_id": "0"}
-            },
-            {
-                "inputName": "Screen Capture",
-                "inputKind": "monitor_capture",
-                "inputSettings": {"monitor": 0}
-            }
+            {"inputName": "Microphone", "inputKind": "wasapi_input_capture", "inputSettings": {"device_id": "default"}},
+            {"inputName": "Webcam", "inputKind": "dshow_input", "inputSettings": {"video_device_id": "0"}},
+            {"inputName": "Screen Capture", "inputKind": "monitor_capture", "inputSettings": {"monitor": 0}},
         ]
     }
     return response
@@ -158,7 +140,7 @@ def mock_stream_status_response():
         "outputDuration": 1234567,
         "outputBytes": 123456789,
         "outputSkippedFrames": 5,
-        "outputTotalFrames": 73800
+        "outputTotalFrames": 73800,
     }
     return response
 
@@ -167,16 +149,12 @@ def mock_stream_status_response():
 def mock_record_status_response():
     """Mock GetRecordStatus response."""
     response = MagicMock()
-    response.datain = {
-        "outputActive": True,
-        "outputPaused": False,
-        "outputDuration": 600000,
-        "outputBytes": 50000000
-    }
+    response.datain = {"outputActive": True, "outputPaused": False, "outputDuration": 600000, "outputBytes": 50000000}
     return response
 
 
 # Helper functions for tests
+
 
 def create_mock_response(data: Dict[str, Any]):
     """Create a mock OBS response."""
@@ -193,6 +171,7 @@ def create_mock_error(error_type: str, message: str):
 
 
 # Async helpers
+
 
 async def async_return(value):
     """Helper to return async value."""
