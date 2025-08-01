@@ -891,7 +891,7 @@ class OBSAgent:
         """
         if self._automation_decorator is None:
             self._init_automation()
-        return self._automation_decorator
+        return self._automation_decorator  # type: ignore[return-value]
 
     @property
     def actions(self) -> ActionBuilder:
@@ -915,7 +915,7 @@ class OBSAgent:
         """
         if self._smart_actions is None:
             self._init_automation()
-        return self._smart_actions
+        return self._smart_actions  # type: ignore[return-value]
 
     def _init_automation(self) -> None:
         """Initialize the automation system."""
@@ -929,7 +929,8 @@ class OBSAgent:
         """Start the automation engine."""
         if self._automation_engine is None:
             self._init_automation()
-        self._automation_engine.start()
+        if self._automation_engine:
+            self._automation_engine.start()
         self.logger.info("Automation engine started")
 
     def stop_automation(self) -> None:
