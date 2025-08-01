@@ -69,7 +69,7 @@ class EventCategory(Enum):
 class BaseEvent(ABC):
     """Base class for all OBS events."""
 
-    event_type: str
+    event_type: str = ""
     event_intent: Optional[int] = None
     event_data: Dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
@@ -101,7 +101,7 @@ class BaseEvent(ABC):
 class CurrentProgramSceneChanged(BaseEvent):
     """Triggered when the current program scene changes."""
 
-    scene_name: str
+    scene_name: str = ""
     scene_uuid: Optional[str] = None
 
     def __post_init__(self):
@@ -121,7 +121,7 @@ class CurrentProgramSceneChanged(BaseEvent):
 class SceneCreated(BaseEvent):
     """Triggered when a new scene is created."""
 
-    scene_name: str
+    scene_name: str = ""
     scene_uuid: Optional[str] = None
     is_group: bool = False
 
@@ -143,7 +143,7 @@ class SceneCreated(BaseEvent):
 class SceneRemoved(BaseEvent):
     """Triggered when a scene is removed."""
 
-    scene_name: str
+    scene_name: str = ""
     scene_uuid: Optional[str] = None
     is_group: bool = False
 
@@ -165,8 +165,8 @@ class SceneRemoved(BaseEvent):
 class SceneNameChanged(BaseEvent):
     """Triggered when a scene name is changed."""
 
-    old_scene_name: str
-    scene_name: str
+    old_scene_name: str = ""
+    scene_name: str = ""
     scene_uuid: Optional[str] = None
 
     def __post_init__(self):
@@ -190,7 +190,7 @@ class SceneNameChanged(BaseEvent):
 class InputCreated(BaseEvent):
     """Triggered when a new input is created."""
 
-    input_name: str
+    input_name: str = ""
     input_uuid: Optional[str] = None
     input_kind: str = ""
     unversioned_input_kind: str = ""
@@ -216,7 +216,7 @@ class InputCreated(BaseEvent):
 class InputRemoved(BaseEvent):
     """Triggered when an input is removed."""
 
-    input_name: str
+    input_name: str = ""
     input_uuid: Optional[str] = None
 
     def __post_init__(self):
@@ -236,7 +236,7 @@ class InputRemoved(BaseEvent):
 class InputMuteStateChanged(BaseEvent):
     """Triggered when an input's mute state changes."""
 
-    input_name: str
+    input_name: str = ""
     input_uuid: Optional[str] = None
     input_muted: bool = False
 
@@ -259,7 +259,7 @@ class InputMuteStateChanged(BaseEvent):
 class InputVolumeChanged(BaseEvent):
     """Triggered when an input's volume changes."""
 
-    input_name: str
+    input_name: str = ""
     input_uuid: Optional[str] = None
     input_volume_mul: float = 1.0
     input_volume_db: float = 0.0
@@ -286,8 +286,8 @@ class InputVolumeChanged(BaseEvent):
 class StreamStateChanged(BaseEvent):
     """Triggered when streaming state changes."""
 
-    output_active: bool
-    output_state: str
+    output_active: bool = False
+    output_state: str = ""
 
     def __post_init__(self):
         self.event_type = "StreamStateChanged"
@@ -307,8 +307,8 @@ class StreamStateChanged(BaseEvent):
 class RecordStateChanged(BaseEvent):
     """Triggered when recording state changes."""
 
-    output_active: bool
-    output_state: str
+    output_active: bool = False
+    output_state: str = ""
     output_path: Optional[str] = None
 
     def __post_init__(self):
@@ -346,7 +346,7 @@ class ExitStarted(BaseEvent):
 class StudioModeStateChanged(BaseEvent):
     """Triggered when Studio Mode is enabled or disabled."""
 
-    studio_mode_enabled: bool
+    studio_mode_enabled: bool = False
 
     def __post_init__(self):
         self.event_type = "StudioModeStateChanged"
@@ -484,18 +484,8 @@ class EventHandler:
                 # Execute handlers with middleware
                 for handler in handlers:
                     try:
-                        # Apply middleware
-                        final_handler = handler
-                        for middleware in reversed(self._middleware):
-                            final_handler = self._wrap_with_middleware(
-                                middleware, final_handler, event
-                            )
-
-                        # Execute handler
-                        if asyncio.iscoroutinefunction(final_handler):
-                            await final_handler(event)
-                        else:
-                            final_handler(event)
+                        # Execute handler with middleware chain
+                        await self._execute_with_middleware(event, handler)
 
                     except Exception as e:
                         logger.error(f"Error in event handler for {event.event_type}: {e}")
@@ -505,18 +495,33 @@ class EventHandler:
             except Exception as e:
                 logger.error(f"Error processing events: {e}")
 
-    def _wrap_with_middleware(
-        self, middleware: MiddlewareType, handler: EventHandlerType, event: BaseEvent
-    ) -> EventHandlerType:
-        """Wrap handler with middleware."""
-
-        async def wrapped():
-            if asyncio.iscoroutinefunction(middleware):
-                await middleware(event, handler)
+    async def _execute_with_middleware(self, event: BaseEvent, handler: EventHandlerType):
+        """Execute handler with middleware chain."""
+        
+        async def execute_handler():
+            """Execute the actual handler."""
+            if asyncio.iscoroutinefunction(handler):
+                await handler(event)
             else:
-                middleware(event, handler)
-
-        return wrapped
+                handler(event)
+        
+        # Build middleware chain from right to left
+        next_handler = execute_handler
+        
+        for middleware in reversed(self._middleware):
+            # Use default parameters to capture the current values
+            def make_middleware_wrapper(mw, next_h):
+                async def middleware_wrapper():
+                    if asyncio.iscoroutinefunction(mw):
+                        await mw(event, next_h)
+                    else:
+                        mw(event, next_h)
+                return middleware_wrapper
+            
+            next_handler = make_middleware_wrapper(middleware, next_handler)
+        
+        # Execute the chain
+        await next_handler()
 
     def start_recording(self):
         """Start recording events."""
@@ -574,34 +579,34 @@ class EventHandler:
 # Middleware Examples
 
 
-async def logging_middleware(event: BaseEvent, next_handler: EventHandlerType):
+async def logging_middleware(event: BaseEvent, next_handler: Callable):
     """Log all events."""
     logger.info(f"Event: {event.event_type} - {event.event_data}")
     if asyncio.iscoroutinefunction(next_handler):
-        await next_handler(event)
+        await next_handler()
     else:
-        next_handler(event)
+        next_handler()
 
 
-async def error_handling_middleware(event: BaseEvent, next_handler: EventHandlerType):
+async def error_handling_middleware(event: BaseEvent, next_handler: Callable):
     """Handle errors in event handlers."""
     try:
         if asyncio.iscoroutinefunction(next_handler):
-            await next_handler(event)
+            await next_handler()
         else:
-            next_handler(event)
+            next_handler()
     except Exception as e:
         logger.error(f"Error handling {event.event_type}: {e}", exc_info=True)
 
 
-async def performance_middleware(event: BaseEvent, next_handler: EventHandlerType):
+async def performance_middleware(event: BaseEvent, next_handler: Callable):
     """Measure event handler performance."""
     start_time = time.time()
     
     if asyncio.iscoroutinefunction(next_handler):
-        await next_handler(event)
+        await next_handler()
     else:
-        next_handler(event)
+        next_handler()
     
     elapsed = time.time() - start_time
     if elapsed > 0.1:  # Log slow handlers
