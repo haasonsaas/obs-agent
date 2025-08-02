@@ -20,11 +20,11 @@ from typing import (
     overload,
     runtime_checkable,
 )
+
 from typing_extensions import ParamSpec, TypeGuard
 
 from .api_responses import OBSResponseData
-from .base import T, R, EventT, ConfigT
-
+from .base import ConfigT, EventT, R, T
 
 # Advanced generic type variables
 RequestT = TypeVar("RequestT")

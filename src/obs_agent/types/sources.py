@@ -6,10 +6,10 @@ specific settings, enabling type-safe source creation and configuration.
 """
 
 from typing import Any, Dict, List, Literal, Union
+
 from typing_extensions import NotRequired, TypedDict
 
 from .base import Font
-
 
 # Source Kind Literals
 SourceKind = Literal[

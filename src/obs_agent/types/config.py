@@ -6,6 +6,7 @@ and TypedDict definitions for configuration structures.
 """
 
 from typing import Any, Dict, List, Optional, Union
+
 from typing_extensions import NotRequired, TypedDict
 
 from .base import BaseConfig

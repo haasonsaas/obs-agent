@@ -6,6 +6,7 @@ with runtime validation and type safety improvements.
 """
 
 from typing import Any, Dict, List, Optional, Type, Union
+
 from typing_extensions import NotRequired, TypedDict
 
 from .base import UUID

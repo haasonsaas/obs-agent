@@ -6,14 +6,15 @@ API responses, ensuring complete type safety when working with OBS data.
 """
 
 from typing import Any, Dict, List, Union
+
 from typing_extensions import NotRequired, TypedDict
 
 from .base import (
     UUID,
-    Milliseconds,
     Bytes,
-    Frames,
     Decibels,
+    Frames,
+    Milliseconds,
     Percentage,
     Transform,
 )

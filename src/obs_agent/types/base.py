@@ -1,6 +1,7 @@
 """Base type definitions and common types used throughout OBS Agent."""
 
 from typing import Any, Dict, Generic, List, NewType, TypeVar, Union
+
 from typing_extensions import NotRequired, TypedDict
 
 # Type variables for generics

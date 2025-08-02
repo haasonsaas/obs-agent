@@ -11,31 +11,26 @@ from typing import Any, AsyncContextManager, Dict, List, Literal, Optional, Unio
 
 from .config import Config
 from .obs_agent_v2 import OBSAgent as BaseOBSAgent
-from .types import (
-    # API Response types
-    OBSVersionInfo,
+from .types import (  # API Response types; Source types; Base types; Generic types; Event types
+    CurrentProgramSceneChangedData,
+    Decibels,
+    InputMuteStateChangedData,
     OBSStats,
-    SourceInfo,
-    VolumeInfo,
-    StreamStatus,
+    OBSVersionInfo,
     RecordingStatus,
-    # Source types
+    SourceInfo,
     SourceKind,
     SourceSettings,
-    # Base types
-    Decibels,
-    # Generic types
-    TypedResult,
+    StreamStatus,
     TypedCache,
+    TypedResult,
     ValidationResult,
-    # Event types
-    CurrentProgramSceneChangedData,
-    InputMuteStateChangedData,
+    VolumeInfo,
 )
 from .types.generics import (
+    EventHandlerProtocol,
     TypedEventHandler,
     TypedValidator,
-    EventHandlerProtocol,
     create_typed_handler,
     ensure_type,
     safe_cast,

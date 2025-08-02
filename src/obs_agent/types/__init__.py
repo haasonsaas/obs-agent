@@ -5,35 +5,38 @@ This module provides complete type safety for all OBS WebSocket API responses,
 internal data structures, and function signatures.
 """
 
-# Import specific types to avoid F403/F405 flake8 errors
-from .base import UUID, Timestamp, Duration, Position, Scale, Transform, Size, Color, Font, T, P, R, EventT, ConfigT
 from .api_responses import (
-    OBSVersionInfo,
+    AudioInfo,
+    FilterInfo,
     OBSStats,
-    SceneList,
+    OBSVersionInfo,
+    OutputInfo,
+    RecordingStatus,
     Scene,
     SceneItem,
+    SceneList,
     SourceInfo,
-    AudioInfo,
-    VolumeInfo,
-    FilterInfo,
-    TransitionInfo,
-    OutputInfo,
     StreamStatus,
-    RecordingStatus,
+    TransitionInfo,
+    VolumeInfo,
 )
-from .config import OBSConnectionConfig as OBSConfig, StreamingConfig, RecordingConfig, AudioConfig, VideoConfig
-from .events import EventData, SceneEventData, SourceEventData, AudioEventData, OutputEventData
+
+# Import specific types to avoid F403/F405 flake8 errors
+from .base import UUID, Color, ConfigT, Duration, EventT, Font, P, Position, R, Scale, Size, T, Timestamp, Transform
+from .config import AudioConfig
+from .config import OBSConnectionConfig as OBSConfig
+from .config import RecordingConfig, StreamingConfig, VideoConfig
+from .events import AudioEventData, EventData, OutputEventData, SceneEventData, SourceEventData
 from .sources import (
+    AudioInputSettings,
+    BrowserSourceSettings,
+    DisplayCaptureSettings,
+    ImageSourceSettings,
     SourceKind,
     SourceSettings,
-    DisplayCaptureSettings,
-    WindowCaptureSettings,
-    AudioInputSettings,
     TextSourceSettings,
-    ImageSourceSettings,
     VideoSourceSettings,
-    BrowserSourceSettings,
+    WindowCaptureSettings,
 )
 
 __all__ = [
