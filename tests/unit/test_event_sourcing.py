@@ -479,6 +479,7 @@ class TestTimeTravelDebugger:
     def test_step_forward_backward(self, debugger_setup):
         """Test stepping through events."""
         import time
+
         event_store, debugger = debugger_setup
 
         # Add events with small delays to ensure unique timestamps
