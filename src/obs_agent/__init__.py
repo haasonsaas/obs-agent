@@ -88,7 +88,7 @@ __all__ = [
     "OBSAgentV2",
     "create_obs_agent",
     # Type-safe classes
-    "TypedOBSAgent", 
+    "TypedOBSAgent",
     "create_typed_obs_agent",
     # Type definitions
     "types",
