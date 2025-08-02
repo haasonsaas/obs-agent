@@ -151,8 +151,14 @@ class DomainEvent(ABC):
 class SceneCreated(DomainEvent):
     """Event fired when a scene is created."""
 
+    aggregate_id: str
     scene_name: str
+    metadata: EventMetadata = field(default_factory=EventMetadata)
     scene_settings: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        # Call parent init logic since dataclasses don't call parent __init__
+        object.__setattr__(self, "event_type", self._get_event_type())
 
     def _get_event_type(self) -> EventType:
         return EventType.SCENE_CREATED
@@ -174,10 +180,16 @@ class SceneCreated(DomainEvent):
 class SceneSwitched(DomainEvent):
     """Event fired when the active scene is switched."""
 
+    aggregate_id: str
     from_scene: str
     to_scene: str
+    metadata: EventMetadata = field(default_factory=EventMetadata)
     transition_type: Optional[str] = None
     transition_duration: Optional[int] = None
+
+    def __post_init__(self):
+        # Call parent init logic since dataclasses don't call parent __init__
+        object.__setattr__(self, "event_type", self._get_event_type())
 
     def _get_event_type(self) -> EventType:
         return EventType.SCENE_SWITCHED
@@ -209,10 +221,16 @@ class SceneSwitched(DomainEvent):
 class SourceCreated(DomainEvent):
     """Event fired when a source is created."""
 
+    aggregate_id: str
     source_name: str
     source_type: str
+    metadata: EventMetadata = field(default_factory=EventMetadata)
     source_settings: Dict[str, Any] = field(default_factory=dict)
     scene_name: Optional[str] = None
+
+    def __post_init__(self):
+        # Call parent init logic since dataclasses don't call parent __init__
+        object.__setattr__(self, "event_type", self._get_event_type())
 
     def _get_event_type(self) -> EventType:
         return EventType.SOURCE_CREATED
@@ -241,10 +259,16 @@ class SourceCreated(DomainEvent):
 class SourceVolumeChanged(DomainEvent):
     """Event fired when a source volume is changed."""
 
+    aggregate_id: str
     source_name: str
     old_volume: float
     new_volume: float
+    metadata: EventMetadata = field(default_factory=EventMetadata)
     volume_db: Optional[float] = None
+
+    def __post_init__(self):
+        # Call parent init logic since dataclasses don't call parent __init__
+        object.__setattr__(self, "event_type", self._get_event_type())
 
     def _get_event_type(self) -> EventType:
         return EventType.SOURCE_VOLUME_CHANGED
@@ -276,9 +300,15 @@ class SourceVolumeChanged(DomainEvent):
 class StreamStarted(DomainEvent):
     """Event fired when streaming starts."""
 
+    aggregate_id: str
+    metadata: EventMetadata = field(default_factory=EventMetadata)
     stream_settings: Dict[str, Any] = field(default_factory=dict)
     stream_key: Optional[str] = None  # Redacted for security
     service: Optional[str] = None
+
+    def __post_init__(self):
+        # Call parent init logic since dataclasses don't call parent __init__
+        object.__setattr__(self, "event_type", self._get_event_type())
 
     def _get_event_type(self) -> EventType:
         return EventType.STREAM_STARTED
@@ -304,10 +334,16 @@ class StreamStarted(DomainEvent):
 class StreamStopped(DomainEvent):
     """Event fired when streaming stops."""
 
+    aggregate_id: str
     duration_seconds: int
     total_frames: int
     dropped_frames: int
     bytes_sent: int
+    metadata: EventMetadata = field(default_factory=EventMetadata)
+
+    def __post_init__(self):
+        # Call parent init logic since dataclasses don't call parent __init__
+        object.__setattr__(self, "event_type", self._get_event_type())
 
     def _get_event_type(self) -> EventType:
         return EventType.STREAM_STOPPED
@@ -339,10 +375,16 @@ class StreamStopped(DomainEvent):
 class AutomationRuleTriggered(DomainEvent):
     """Event fired when an automation rule is triggered."""
 
+    aggregate_id: str
     rule_id: str
     rule_name: str
     trigger_type: str
+    metadata: EventMetadata = field(default_factory=EventMetadata)
     trigger_data: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        # Call parent init logic since dataclasses don't call parent __init__
+        object.__setattr__(self, "event_type", self._get_event_type())
 
     def _get_event_type(self) -> EventType:
         return EventType.AUTOMATION_RULE_TRIGGERED
@@ -373,11 +415,17 @@ class AutomationRuleTriggered(DomainEvent):
 class AutomationRuleExecuted(DomainEvent):
     """Event fired when an automation rule executes successfully."""
 
+    aggregate_id: str
     rule_id: str
     rule_name: str
     actions_executed: List[str]
     execution_time_ms: float
+    metadata: EventMetadata = field(default_factory=EventMetadata)
     result: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        # Call parent init logic since dataclasses don't call parent __init__
+        object.__setattr__(self, "event_type", self._get_event_type())
 
     def _get_event_type(self) -> EventType:
         return EventType.AUTOMATION_RULE_EXECUTED

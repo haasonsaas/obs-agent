@@ -40,7 +40,15 @@
       "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_config.py::TestConfig::test_load_default -xvs)",
       "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_exceptions.py::TestHandleOBSError::test_handle_websocket_errors -xvs)",
       "Bash(mv:*)",
-      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/ -q)"
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/ -q)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_event_sourcing.py -xvs)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python3 -m pytest tests/unit/test_event_sourcing.py -xvs)",
+      "Bash(pip3 install:*)",
+      "Bash(sed:*)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_event_sourcing.py::TestDomainEvents -xvs)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_event_sourcing.py::TestDomainEvents::test_scene_created_event -xvs)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python3:*)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_event_sourcing.py -x --tb=short)"
     ],
     "deny": []
   }
