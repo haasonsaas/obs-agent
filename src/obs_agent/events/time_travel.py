@@ -287,13 +287,13 @@ class TimeTravelDebugger:
         events = self.current_session.events_in_range
 
         # Count events by type
-        event_counts = {}
+        event_counts: Dict[str, int] = {}
         for event in events:
             event_type = event.event_type.value
             event_counts[event_type] = event_counts.get(event_type, 0) + 1
 
         # Find most active aggregates
-        aggregate_counts = {}
+        aggregate_counts: Dict[str, int] = {}
         for event in events:
             agg_id = event.aggregate_id
             aggregate_counts[agg_id] = aggregate_counts.get(agg_id, 0) + 1
@@ -341,7 +341,7 @@ class TimeTravelDebugger:
 
     def _build_state_from_events(self, events: List[DomainEvent]) -> Dict[str, Any]:
         """Build system state from a list of events."""
-        state = {
+        state: Dict[str, Any] = {
             "current_scene": "Unknown",
             "is_streaming": False,
             "is_recording": False,

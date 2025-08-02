@@ -69,13 +69,13 @@ class EventSourcingSystem:
 
         # Initialize projections
         if self.config.enable_projections:
-            self.projection_builder = ProjectionBuilder(self.event_store)
+            self.projection_builder: Optional[ProjectionBuilder] = ProjectionBuilder(self.event_store)
         else:
             self.projection_builder = None
 
         # Initialize time-travel debugger
         if self.config.enable_time_travel:
-            self.debugger = TimeTravelDebugger(self.event_store)
+            self.debugger: Optional[TimeTravelDebugger] = TimeTravelDebugger(self.event_store)
         else:
             self.debugger = None
 
@@ -88,15 +88,15 @@ class EventSourcingSystem:
     def _setup_interceptors(self):
         """Set up interceptors for OBS Agent operations."""
         # Store original methods
-        original_switch_scene = self.obs_agent.scenes.switch_scene
-        original_start_stream = self.obs_agent.streaming.start_stream
-        original_stop_stream = self.obs_agent.streaming.stop_stream
+        original_switch_scene = self.obs_agent.scenes.switch_scene  # type: ignore
+        original_start_stream = self.obs_agent.streaming.start_stream  # type: ignore
+        original_stop_stream = self.obs_agent.streaming.stop_stream  # type: ignore
 
         # Create intercepting wrappers
         async def switch_scene_interceptor(scene_name: str, *args, **kwargs):
             """Intercept scene switching."""
             # Get current scene before switch
-            current_scene = await self.obs_agent.scenes.get_current_scene()
+            current_scene = await self.obs_agent.scenes.get_current_scene()  # type: ignore
 
             # Perform the actual switch
             result = await original_switch_scene(scene_name, *args, **kwargs)
@@ -131,7 +131,7 @@ class EventSourcingSystem:
         async def stop_stream_interceptor(*args, **kwargs):
             """Intercept stream stop."""
             # Get stream stats before stopping
-            stats = await self.obs_agent.streaming.get_stream_status()
+            stats = await self.obs_agent.streaming.get_stream_status()  # type: ignore
 
             result = await original_stop_stream(*args, **kwargs)
 
@@ -148,9 +148,9 @@ class EventSourcingSystem:
             return result
 
         # Replace methods with interceptors
-        self.obs_agent.scenes.switch_scene = switch_scene_interceptor
-        self.obs_agent.streaming.start_stream = start_stream_interceptor
-        self.obs_agent.streaming.stop_stream = stop_stream_interceptor
+        self.obs_agent.scenes.switch_scene = switch_scene_interceptor  # type: ignore
+        self.obs_agent.streaming.start_stream = start_stream_interceptor  # type: ignore
+        self.obs_agent.streaming.stop_stream = stop_stream_interceptor  # type: ignore
 
         # Hook into automation system
         self._setup_automation_interceptors()
@@ -159,7 +159,7 @@ class EventSourcingSystem:
         """Set up interceptors for automation events."""
         if hasattr(self.obs_agent, "automation"):
             # Subscribe to automation events
-            automation = self.obs_agent.automation
+            automation = self.obs_agent.automation  # type: ignore
 
             # Track rule triggers
             original_trigger = automation._trigger_rule if hasattr(automation, "_trigger_rule") else None

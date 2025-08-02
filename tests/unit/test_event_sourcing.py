@@ -123,6 +123,7 @@ class TestEventStore:
         with tempfile.TemporaryDirectory() as tmpdir:
             store = EventStore(db_path=Path(tmpdir) / "test_events.db")
             yield store
+            store.close()  # Close store before cleanup
 
     def test_append_and_retrieve_events(self, event_store):
         """Test appending and retrieving events."""
@@ -240,6 +241,7 @@ class TestCQRS:
             read_model = ReadModel(event_store)
             query_bus = QueryBus(event_store, read_model)
             yield event_store, command_bus, query_bus, read_model
+            event_store.close()  # Close store before cleanup
 
     @pytest.mark.asyncio
     async def test_switch_scene_command(self, setup_cqrs):
@@ -324,6 +326,7 @@ class TestProjections:
             event_store = EventStore(db_path=Path(tmpdir) / "test_events.db")
             builder = ProjectionBuilder(event_store)
             yield event_store, builder
+            event_store.close()  # Close store before cleanup
 
     def test_scene_projection(self, projection_setup):
         """Test scene projection."""
@@ -429,6 +432,7 @@ class TestTimeTravelDebugger:
             event_store = EventStore(db_path=Path(tmpdir) / "test_events.db")
             debugger = TimeTravelDebugger(event_store)
             yield event_store, debugger
+            event_store.close()  # Close store before cleanup
 
     def test_start_debug_session(self, debugger_setup):
         """Test starting a debug session."""
@@ -615,41 +619,45 @@ class TestAsyncOperations:
         """Test async event streaming."""
         with tempfile.TemporaryDirectory() as tmpdir:
             event_store = EventStore(db_path=Path(tmpdir) / "test_events.db")
+            try:
+                # Add events
+                for i in range(10):
+                    event_store.append(SceneCreated(aggregate_id=f"scene:{i}", scene_name=f"Scene {i}"))
 
-            # Add events
-            for i in range(10):
-                event_store.append(SceneCreated(aggregate_id=f"scene:{i}", scene_name=f"Scene {i}"))
+                # Stream events
+                batches = []
+                async for batch in event_store.stream_events(batch_size=3):
+                    batches.append(batch)
 
-            # Stream events
-            batches = []
-            async for batch in event_store.stream_events(batch_size=3):
-                batches.append(batch)
-
-            assert len(batches) == 4  # 10 events / 3 per batch = 4 batches
-            assert len(batches[0]) == 3
-            assert len(batches[-1]) == 1  # Last batch has remainder
+                assert len(batches) == 4  # 10 events / 3 per batch = 4 batches
+                assert len(batches[0]) == 3
+                assert len(batches[-1]) == 1  # Last batch has remainder
+            finally:
+                event_store.close()  # Close store before cleanup
 
     async def test_continuous_projection_updates(self):
         """Test continuous projection updates."""
         with tempfile.TemporaryDirectory() as tmpdir:
             event_store = EventStore(db_path=Path(tmpdir) / "test_events.db")
             builder = ProjectionBuilder(event_store)
+            try:
+                # Start continuous updates
+                await builder.start_continuous_update(interval=0.1)
 
-            # Start continuous updates
-            await builder.start_continuous_update(interval=0.1)
+                # Add events
+                event_store.append(SceneCreated(aggregate_id="scene:1", scene_name="Dynamic Scene"))
 
-            # Add events
-            event_store.append(SceneCreated(aggregate_id="scene:1", scene_name="Dynamic Scene"))
+                # Wait for update
+                await asyncio.sleep(0.2)
 
-            # Wait for update
-            await asyncio.sleep(0.2)
+                # Check projection updated
+                projection = builder.get_projection("scenes")
+                assert "Dynamic Scene" in projection.state["scenes"]
 
-            # Check projection updated
-            projection = builder.get_projection("scenes")
-            assert "Dynamic Scene" in projection.state["scenes"]
-
-            # Stop updates
-            await builder.stop_continuous_update()
+                # Stop updates
+                await builder.stop_continuous_update()
+            finally:
+                event_store.close()  # Close store before cleanup
 
 
 class TestEventStoreCompaction:
@@ -659,32 +667,34 @@ class TestEventStoreCompaction:
         """Test compacting old events while keeping snapshots."""
         with tempfile.TemporaryDirectory() as tmpdir:
             event_store = EventStore(db_path=Path(tmpdir) / "test_events.db")
+            try:
+                # Add old events
+                old_time = datetime.utcnow() - timedelta(days=7)
+                for i in range(10):
+                    event = SceneCreated(
+                        "scene:old", metadata=EventMetadata(timestamp=old_time), scene_name=f"Old Scene {i}"
+                    )
+                    event_store.append(event)
 
-            # Add old events
-            old_time = datetime.utcnow() - timedelta(days=7)
-            for i in range(10):
-                event = SceneCreated(
-                    "scene:old", metadata=EventMetadata(timestamp=old_time), scene_name=f"Old Scene {i}"
+                # Create snapshot
+                snapshot = Snapshot(
+                    "scene:old", version=5, timestamp=old_time + timedelta(hours=1), state={"scene_count": 5}
                 )
-                event_store.append(event)
+                event_store.save_snapshot(snapshot)
 
-            # Create snapshot
-            snapshot = Snapshot(
-                "scene:old", version=5, timestamp=old_time + timedelta(hours=1), state={"scene_count": 5}
-            )
-            event_store.save_snapshot(snapshot)
+                # Add recent events
+                for i in range(5):
+                    event = SceneCreated(aggregate_id="scene:new", scene_name=f"New Scene {i}")
+                    event_store.append(event)
 
-            # Add recent events
-            for i in range(5):
-                event = SceneCreated(aggregate_id="scene:new", scene_name=f"New Scene {i}")
-                event_store.append(event)
+                # Compact old events
+                cutoff = datetime.utcnow() - timedelta(days=1)
+                removed = event_store.compact(before=cutoff, keep_snapshots=True)
 
-            # Compact old events
-            cutoff = datetime.utcnow() - timedelta(days=1)
-            removed = event_store.compact(before=cutoff, keep_snapshots=True)
+                assert removed > 0
 
-            assert removed > 0
-
-            # Verify recent events still exist
-            recent_events = event_store.get_events("scene:new")
-            assert len(recent_events) == 5
+                # Verify recent events still exist
+                recent_events = event_store.get_events("scene:new")
+                assert len(recent_events) == 5
+            finally:
+                event_store.close()  # Close store before cleanup

@@ -6,8 +6,8 @@ try:
     from .advanced_features import AdvancedOBSAgent, AdvancedOBSController
 except ImportError:
     # Allow partial imports when obswebsocket is not available
-    AdvancedOBSAgent = None
-    AdvancedOBSController = None
+    AdvancedOBSAgent = None  # type: ignore
+    AdvancedOBSController = None  # type: ignore
 from .config import Config, LoggingConfig, OBSConfig, StreamingConfig, get_config, set_config
 from .connection import ConnectionManager, get_connection_manager, obs_connection
 
@@ -48,8 +48,8 @@ from .logging import get_logger, log_context, setup_logging
 try:
     from .obs_agent import OBSAgent, OBSController
 except ImportError:
-    OBSAgent = None
-    OBSController = None
+    OBSAgent = None  # type: ignore
+    OBSController = None  # type: ignore
 
 # New improved modules
 from .obs_agent_v2 import OBSAgent as OBSAgentV2

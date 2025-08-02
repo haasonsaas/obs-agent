@@ -200,8 +200,9 @@ class SwitchSceneHandler(CommandHandler):
     def can_handle(self, command: Command) -> bool:
         return isinstance(command, SwitchScene)
 
-    async def handle(self, command: SwitchScene) -> List[DomainEvent]:
+    async def handle(self, command: Command) -> List[DomainEvent]:
         """Handle scene switch command."""
+        assert isinstance(command, SwitchScene)  # Type narrowing for MyPy
         # Get current scene from event history
         events = self.event_store.get_events("obs_system")
         current_scene = "Unknown"
@@ -232,8 +233,9 @@ class StartStreamHandler(CommandHandler):
     def can_handle(self, command: Command) -> bool:
         return isinstance(command, StartStream)
 
-    async def handle(self, command: StartStream) -> List[DomainEvent]:
+    async def handle(self, command: Command) -> List[DomainEvent]:
         """Handle start stream command."""
+        assert isinstance(command, StartStream)  # Type narrowing for MyPy
         # Check if already streaming
         events = self.event_store.get_events("stream")
         is_streaming = False
@@ -289,8 +291,9 @@ class GetCurrentSceneHandler(QueryHandler):
     def can_handle(self, query: Query) -> bool:
         return isinstance(query, GetCurrentScene)
 
-    async def handle(self, query: GetCurrentScene) -> str:
+    async def handle(self, query: Query) -> Any:
         """Get the current scene from read model."""
+        assert isinstance(query, GetCurrentScene)  # Type narrowing for MyPy
         return self.read_model.get_current_scene()
 
 
@@ -300,8 +303,9 @@ class GetEventHistoryHandler(QueryHandler):
     def can_handle(self, query: Query) -> bool:
         return isinstance(query, GetEventHistory)
 
-    async def handle(self, query: GetEventHistory) -> List[Dict[str, Any]]:
+    async def handle(self, query: Query) -> Any:
         """Get event history."""
+        assert isinstance(query, GetEventHistory)  # Type narrowing for MyPy
         events = self.event_store.replay_events(aggregate_id=query.aggregate_id, since=query.since, until=query.until)
 
         if query.limit:

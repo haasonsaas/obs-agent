@@ -165,6 +165,13 @@ class EventStore:
             """
             )
 
+    def close(self):
+        """Close the event store and clean up resources."""
+        # Force close any remaining SQLite connections
+        # This helps with Windows file locking issues
+        import gc
+        gc.collect()
+        
     def _load_events(self):
         """Load all events from database into memory."""
         with sqlite3.connect(str(self.db_path)) as conn:
