@@ -1,13 +1,13 @@
 """Base type definitions and common types used throughout OBS Agent."""
 
-from typing import Any, Dict, Generic, List, NewType, Optional, TypeVar, Union
+from typing import Any, Dict, Generic, List, NewType, TypeVar, Union
 from typing_extensions import NotRequired, TypedDict
 
 # Type variables for generics
 T = TypeVar("T")
 P = TypeVar("P")  # Parameters
 R = TypeVar("R")  # Return type
-EventT = TypeVar("EventT", bound="BaseEvent")
+EventT = TypeVar("EventT")  # Event type variable (unbound for flexibility)
 ConfigT = TypeVar("ConfigT", bound="BaseConfig")
 
 # Common scalar types
@@ -24,24 +24,28 @@ RGB = NewType("RGB", int)  # 0xRRGGBB format
 
 class Position(TypedDict):
     """Position coordinates."""
+
     x: float
     y: float
 
 
 class Scale(TypedDict):
     """Scale factors."""
+
     x: float
     y: float
 
 
 class Size(TypedDict):
     """Dimensions."""
+
     width: int
     height: int
 
 
 class Crop(TypedDict):
     """Crop settings."""
+
     top: int
     bottom: int
     left: int
@@ -50,6 +54,7 @@ class Crop(TypedDict):
 
 class Transform(TypedDict):
     """Complete transform information for scene items."""
+
     position: Position
     scale: Scale
     rotation: float
@@ -62,6 +67,7 @@ class Transform(TypedDict):
 
 class Color(TypedDict):
     """Color definition."""
+
     r: int  # 0-255
     g: int  # 0-255
     b: int  # 0-255
@@ -70,6 +76,7 @@ class Color(TypedDict):
 
 class Font(TypedDict):
     """Font definition."""
+
     face: str
     size: int
     style: NotRequired[str]  # "Bold", "Italic", "Bold Italic", "Regular"
@@ -78,6 +85,7 @@ class Font(TypedDict):
 
 class Range(TypedDict, Generic[T]):
     """Generic range type."""
+
     min: T
     max: T
     current: NotRequired[T]
@@ -85,21 +93,22 @@ class Range(TypedDict, Generic[T]):
 
 class Bounds(TypedDict):
     """Boundary constraints."""
+
     min_value: float
     max_value: float
     step: NotRequired[float]
 
 
 # Validation types
-ValidationResult = TypedDict("ValidationResult", {
-    "valid": bool,
-    "errors": List[str],
-    "warnings": NotRequired[List[str]]
-})
+ValidationResult = TypedDict(
+    "ValidationResult", {"valid": bool, "errors": List[str], "warnings": NotRequired[List[str]]}
+)
+
 
 # Result types for operations
 class OperationResult(TypedDict, Generic[T]):
     """Generic operation result."""
+
     success: bool
     data: NotRequired[T]
     error: NotRequired[str]
@@ -108,6 +117,7 @@ class OperationResult(TypedDict, Generic[T]):
 
 class PaginatedResult(TypedDict, Generic[T]):
     """Paginated result set."""
+
     items: List[T]
     total_count: int
     page: int
@@ -119,6 +129,7 @@ class PaginatedResult(TypedDict, Generic[T]):
 # Connection and status types
 class ConnectionInfo(TypedDict):
     """WebSocket connection information."""
+
     host: str
     port: int
     connected: bool
@@ -129,6 +140,7 @@ class ConnectionInfo(TypedDict):
 
 class HealthStatus(TypedDict):
     """System health status."""
+
     status: str  # "healthy", "degraded", "unhealthy"
     checks: Dict[str, bool]
     last_check: Timestamp
@@ -138,6 +150,7 @@ class HealthStatus(TypedDict):
 # Configuration base types
 class BaseConfig(TypedDict):
     """Base configuration interface."""
+
     version: str
     created_at: Timestamp
     updated_at: NotRequired[Timestamp]
@@ -146,6 +159,7 @@ class BaseConfig(TypedDict):
 # Error types
 class ErrorInfo(TypedDict):
     """Detailed error information."""
+
     code: str
     message: str
     details: NotRequired[Dict[str, Any]]
@@ -156,6 +170,7 @@ class ErrorInfo(TypedDict):
 # Metrics and statistics
 class Metric(TypedDict):
     """Generic metric definition."""
+
     name: str
     value: Union[int, float, str]
     unit: NotRequired[str]
@@ -165,6 +180,7 @@ class Metric(TypedDict):
 
 class Statistics(TypedDict):
     """Collection of metrics."""
+
     metrics: List[Metric]
     collected_at: Timestamp
     period: NotRequired[Duration]
@@ -174,9 +190,11 @@ class Statistics(TypedDict):
 CallbackFunction = TypeVar("CallbackFunction", bound=callable)
 AsyncCallbackFunction = TypeVar("AsyncCallbackFunction", bound=callable)
 
+
 # Event filter types
 class FilterCriteria(TypedDict):
     """Event filtering criteria."""
+
     event_types: NotRequired[List[str]]
     priority_min: NotRequired[str]
     source_patterns: NotRequired[List[str]]
@@ -186,6 +204,7 @@ class FilterCriteria(TypedDict):
 # Automation types
 class AutomationMetadata(TypedDict):
     """Metadata for automation rules."""
+
     name: str
     description: str
     author: NotRequired[str]
@@ -196,6 +215,7 @@ class AutomationMetadata(TypedDict):
 
 class RuleExecution(TypedDict):
     """Automation rule execution record."""
+
     rule_name: str
     execution_id: str
     started_at: Timestamp

@@ -6,13 +6,24 @@ better type inference and safety throughout the OBS Agent codebase.
 """
 
 from typing import (
-    Any, Awaitable, Callable, Dict, Generic, List, Optional, Protocol, 
-    Type, TypeVar, Union, overload, runtime_checkable
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Protocol,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+    runtime_checkable,
 )
 from typing_extensions import ParamSpec, TypeGuard
 
 from .api_responses import OBSResponseData
-from .base import T, P, R, EventT, ConfigT, OperationResult
+from .base import T, R, EventT, ConfigT
 
 
 # Advanced generic type variables
@@ -35,43 +46,43 @@ P_Transform = ParamSpec("P_Transform")
 @runtime_checkable
 class OBSRequestProtocol(Protocol[RequestT, ResponseT]):
     """Protocol for OBS WebSocket requests."""
-    
+
     def __init__(self, **kwargs: Any) -> None: ...
-    
+
     def datain(self) -> ResponseT: ...
 
 
 @runtime_checkable
 class EventHandlerProtocol(Protocol[EventT]):
     """Protocol for event handlers."""
-    
+
     def __call__(self, event: EventT) -> Union[None, Awaitable[None]]: ...
 
 
 @runtime_checkable
 class ConfigurableProtocol(Protocol[ConfigT]):
     """Protocol for configurable objects."""
-    
+
     def configure(self, config: ConfigT) -> None: ...
-    
+
     def get_config(self) -> ConfigT: ...
 
 
 @runtime_checkable
 class ValidatableProtocol(Protocol[T]):
     """Protocol for objects that can be validated."""
-    
+
     def validate(self) -> bool: ...
-    
+
     def get_errors(self) -> List[str]: ...
 
 
 @runtime_checkable
 class SerializableProtocol(Protocol[T]):
     """Protocol for serializable objects."""
-    
+
     def to_dict(self) -> Dict[str, Any]: ...
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> T: ...
 
@@ -79,35 +90,31 @@ class SerializableProtocol(Protocol[T]):
 @runtime_checkable
 class CacheableProtocol(Protocol[T]):
     """Protocol for cacheable objects."""
-    
+
     def cache_key(self) -> str: ...
-    
+
     def is_cache_valid(self) -> bool: ...
 
 
 @runtime_checkable
 class TransformableProtocol(Protocol[T, R]):
     """Protocol for transformable objects."""
-    
+
     def transform(self, func: Callable[[T], R]) -> R: ...
 
 
 # Generic wrapper classes
 class TypedRequest(Generic[RequestT, ResponseT]):
     """Type-safe wrapper for OBS requests."""
-    
-    def __init__(
-        self, 
-        request_class: Type[RequestT], 
-        response_type: Type[ResponseT]
-    ) -> None:
+
+    def __init__(self, request_class: Type[RequestT], response_type: Type[ResponseT]) -> None:
         self.request_class = request_class
         self.response_type = response_type
-    
+
     def create(self, **kwargs: Any) -> RequestT:
         """Create a typed request instance."""
         return self.request_class(**kwargs)
-    
+
     def validate_response(self, response: Any) -> TypeGuard[ResponseT]:
         """Validate response type."""
         return isinstance(response, dict)  # Basic validation
@@ -115,15 +122,11 @@ class TypedRequest(Generic[RequestT, ResponseT]):
 
 class TypedEventHandler(Generic[EventT]):
     """Type-safe event handler wrapper."""
-    
-    def __init__(
-        self, 
-        event_type: Type[EventT], 
-        handler: EventHandlerProtocol[EventT]
-    ) -> None:
+
+    def __init__(self, event_type: Type[EventT], handler: EventHandlerProtocol[EventT]) -> None:
         self.event_type = event_type
         self.handler = handler
-    
+
     async def handle(self, event: EventT) -> None:
         """Handle the event with type safety."""
         result = self.handler(event)
@@ -133,15 +136,11 @@ class TypedEventHandler(Generic[EventT]):
 
 class TypedValidator(Generic[T]):
     """Type-safe validator wrapper."""
-    
-    def __init__(
-        self, 
-        target_type: Type[T], 
-        validator: Callable[[T], bool]
-    ) -> None:
+
+    def __init__(self, target_type: Type[T], validator: Callable[[T], bool]) -> None:
         self.target_type = target_type
         self.validator = validator
-    
+
     def validate(self, value: Any) -> TypeGuard[T]:
         """Validate value with type guard."""
         if not isinstance(value, self.target_type):
@@ -151,15 +150,11 @@ class TypedValidator(Generic[T]):
 
 class TypedFilter(Generic[T]):
     """Type-safe filter wrapper."""
-    
-    def __init__(
-        self, 
-        item_type: Type[T], 
-        predicate: Callable[[T], bool]
-    ) -> None:
+
+    def __init__(self, item_type: Type[T], predicate: Callable[[T], bool]) -> None:
         self.item_type = item_type
         self.predicate = predicate
-    
+
     def filter(self, items: List[Any]) -> List[T]:
         """Filter items with type safety."""
         result: List[T] = []
@@ -171,43 +166,38 @@ class TypedFilter(Generic[T]):
 
 class TypedTransformer(Generic[T, R]):
     """Type-safe transformer wrapper."""
-    
-    def __init__(
-        self, 
-        input_type: Type[T], 
-        output_type: Type[R],
-        transformer: Callable[[T], R]
-    ) -> None:
+
+    def __init__(self, input_type: Type[T], output_type: Type[R], transformer: Callable[[T], R]) -> None:
         self.input_type = input_type
         self.output_type = output_type
         self.transformer = transformer
-    
+
     def transform(self, value: T) -> R:
         """Transform value with type safety."""
         if not isinstance(value, self.input_type):
             raise TypeError(f"Expected {self.input_type}, got {type(value)}")
-        
+
         result = self.transformer(value)
-        
+
         if not isinstance(result, self.output_type):
             raise TypeError(f"Transform produced {type(result)}, expected {self.output_type}")
-        
+
         return result
 
 
 # Result and operation types
 class TypedResult(Generic[T]):
     """Type-safe operation result."""
-    
+
     def __init__(self, success: bool, data: Optional[T] = None, error: Optional[str] = None):
         self.success = success
         self.data = data
         self.error = error
-    
+
     def is_success(self) -> TypeGuard[T]:
         """Check if result is successful with type guard."""
         return self.success and self.data is not None
-    
+
     def unwrap(self) -> T:
         """Unwrap result data or raise exception."""
         if not self.success:
@@ -215,7 +205,7 @@ class TypedResult(Generic[T]):
         if self.data is None:
             raise ValueError("No data available")
         return self.data
-    
+
     def unwrap_or(self, default: T) -> T:
         """Unwrap result data or return default."""
         return self.data if self.success and self.data is not None else default
@@ -223,25 +213,25 @@ class TypedResult(Generic[T]):
 
 class TypedCache(Generic[T]):
     """Type-safe cache implementation."""
-    
+
     def __init__(self, item_type: Type[T]) -> None:
         self.item_type = item_type
         self._cache: Dict[str, T] = {}
-    
+
     def get(self, key: str) -> Optional[T]:
         """Get item from cache with type safety."""
         return self._cache.get(key)
-    
+
     def set(self, key: str, value: T) -> None:
         """Set item in cache with type validation."""
         if not isinstance(value, self.item_type):
             raise TypeError(f"Expected {self.item_type}, got {type(value)}")
         self._cache[key] = value
-    
+
     def has(self, key: str) -> bool:
         """Check if key exists in cache."""
         return key in self._cache
-    
+
     def clear(self) -> None:
         """Clear all cache entries."""
         self._cache.clear()
@@ -249,20 +239,17 @@ class TypedCache(Generic[T]):
 
 # Function overloads for better type inference
 @overload
-def create_typed_handler(
-    event_type: Type[EventT], 
-    handler: Callable[[EventT], None]
-) -> TypedEventHandler[EventT]: ...
+def create_typed_handler(event_type: Type[EventT], handler: Callable[[EventT], None]) -> TypedEventHandler[EventT]: ...
+
 
 @overload
 def create_typed_handler(
-    event_type: Type[EventT], 
-    handler: Callable[[EventT], Awaitable[None]]
+    event_type: Type[EventT], handler: Callable[[EventT], Awaitable[None]]
 ) -> TypedEventHandler[EventT]: ...
 
+
 def create_typed_handler(
-    event_type: Type[EventT], 
-    handler: Union[Callable[[EventT], None], Callable[[EventT], Awaitable[None]]]
+    event_type: Type[EventT], handler: Union[Callable[[EventT], None], Callable[[EventT], Awaitable[None]]]
 ) -> TypedEventHandler[EventT]:
     """Create a typed event handler with proper overloads."""
     return TypedEventHandler(event_type, handler)
@@ -271,17 +258,19 @@ def create_typed_handler(
 @overload
 def validate_and_cast(value: Any, target_type: Type[T]) -> T: ...
 
+
 @overload
 def validate_and_cast(value: Any, target_type: Type[T], default: T) -> T: ...
+
 
 def validate_and_cast(value: Any, target_type: Type[T], default: Optional[T] = None) -> T:
     """Validate and cast value to target type."""
     if isinstance(value, target_type):
         return value
-    
+
     if default is not None:
         return default
-    
+
     raise TypeError(f"Cannot cast {type(value)} to {target_type}")
 
 
@@ -336,21 +325,21 @@ def group_by_type(items: List[Any]) -> Dict[Type[Any], List[Any]]:
 # Async type utilities
 class AsyncTypedResult(Generic[T]):
     """Async version of TypedResult."""
-    
+
     def __init__(self, success: bool, data: Optional[T] = None, error: Optional[str] = None):
         self.success = success
         self.data = data
         self.error = error
-    
+
     async def unwrap_async(self) -> T:
         """Async unwrap - useful for chaining async operations."""
         return self.unwrap()
-    
+
     async def map_async(self, func: Callable[[T], Awaitable[R]]) -> "AsyncTypedResult[R]":
         """Map result through async function."""
         if not self.success or self.data is None:
             return AsyncTypedResult(False, error=self.error)
-        
+
         try:
             new_data = await func(self.data)
             return AsyncTypedResult(True, new_data)
@@ -369,11 +358,7 @@ def create_filter(item_type: Type[T], predicate: Callable[[T], bool]) -> TypedFi
     return TypedFilter(item_type, predicate)
 
 
-def create_transformer(
-    input_type: Type[T], 
-    output_type: Type[R], 
-    func: Callable[[T], R]
-) -> TypedTransformer[T, R]:
+def create_transformer(input_type: Type[T], output_type: Type[R], func: Callable[[T], R]) -> TypedTransformer[T, R]:
     """Create a typed transformer."""
     return TypedTransformer(input_type, output_type, func)
 

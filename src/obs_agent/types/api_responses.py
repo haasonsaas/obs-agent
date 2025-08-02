@@ -5,18 +5,24 @@ This module provides exhaustive TypedDict definitions for all OBS WebSocket
 API responses, ensuring complete type safety when working with OBS data.
 """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 from typing_extensions import NotRequired, TypedDict
 
 from .base import (
-    UUID, Timestamp, Duration, Milliseconds, Bytes, Frames, Decibels, 
-    Percentage, Position, Scale, Size, Crop, Transform, Color, Font
+    UUID,
+    Milliseconds,
+    Bytes,
+    Frames,
+    Decibels,
+    Percentage,
+    Transform,
 )
 
 
 # Version and General Info
 class OBSVersionInfo(TypedDict):
     """OBS version information from GetVersion request."""
+
     obs_version: str
     obs_web_socket_version: str
     rpc_version: int
@@ -28,6 +34,7 @@ class OBSVersionInfo(TypedDict):
 
 class OBSStats(TypedDict):
     """OBS statistics from GetStats request."""
+
     cpu_usage: Percentage
     memory_usage: Bytes
     available_disk_space: Bytes
@@ -45,6 +52,7 @@ class OBSStats(TypedDict):
 # Scene Types
 class SceneItem(TypedDict):
     """Individual scene item information."""
+
     scene_item_id: int
     scene_item_index: int
     source_name: str
@@ -60,6 +68,7 @@ class SceneItem(TypedDict):
 
 class Scene(TypedDict):
     """Scene information."""
+
     scene_name: str
     scene_uuid: UUID
     scene_index: int
@@ -68,6 +77,7 @@ class Scene(TypedDict):
 
 class SceneList(TypedDict):
     """Complete scene list from GetSceneList."""
+
     current_program_scene_name: str
     current_program_scene_uuid: UUID
     current_preview_scene_name: NotRequired[str]
@@ -77,6 +87,7 @@ class SceneList(TypedDict):
 
 class SceneItemTransformInfo(TypedDict):
     """Detailed scene item transform from GetSceneItemTransform."""
+
     scene_item_id: int
     scene_item_transform: Transform
 
@@ -84,6 +95,7 @@ class SceneItemTransformInfo(TypedDict):
 # Source Types
 class SourceInfo(TypedDict):
     """Basic source information."""
+
     input_name: str
     input_uuid: UUID
     input_kind: str
@@ -92,6 +104,7 @@ class SourceInfo(TypedDict):
 
 class SourceDetails(TypedDict):
     """Detailed source information from GetInputSettings."""
+
     input_name: str
     input_uuid: UUID
     input_kind: str
@@ -101,6 +114,7 @@ class SourceDetails(TypedDict):
 
 class SourcePropertiesInfo(TypedDict):
     """Source properties from GetInputPropertiesListPropertyItems."""
+
     property_name: str
     property_description: str
     property_type: str
@@ -112,18 +126,21 @@ class SourcePropertiesInfo(TypedDict):
 
 class InputList(TypedDict):
     """List of inputs from GetInputList."""
+
     inputs: List[SourceInfo]
 
 
 # Audio Types
 class VolumeInfo(TypedDict):
     """Audio volume information."""
+
     input_volume_mul: float  # Multiplier (0.0 - 20.0)
     input_volume_db: Decibels  # Decibels (-100.0 to 26.0)
 
 
 class AudioInfo(TypedDict):
     """Complete audio source information."""
+
     input_name: str
     input_uuid: UUID
     input_muted: bool
@@ -136,12 +153,14 @@ class AudioInfo(TypedDict):
 
 class AudioMonitorInfo(TypedDict):
     """Audio monitoring information."""
+
     monitor_type: str  # "none", "monitorOnly", "monitorAndOutput"
 
 
 # Filter Types
 class FilterInfo(TypedDict):
     """Filter information."""
+
     filter_name: str
     filter_kind: str
     filter_index: int
@@ -151,12 +170,14 @@ class FilterInfo(TypedDict):
 
 class SourceFilterList(TypedDict):
     """List of filters on a source."""
+
     filters: List[FilterInfo]
 
 
 # Transition Types
 class TransitionInfo(TypedDict):
     """Scene transition information."""
+
     transition_name: str
     transition_kind: str
     transition_fixed: bool
@@ -165,6 +186,7 @@ class TransitionInfo(TypedDict):
 
 class TransitionList(TypedDict):
     """List of available transitions."""
+
     current_scene_transition_name: str
     current_scene_transition_uuid: UUID
     current_scene_transition_kind: str
@@ -173,6 +195,7 @@ class TransitionList(TypedDict):
 
 class CurrentTransitionInfo(TypedDict):
     """Current transition information."""
+
     transition_name: str
     transition_uuid: UUID
     transition_kind: str
@@ -185,6 +208,7 @@ class CurrentTransitionInfo(TypedDict):
 # Output Types (Streaming/Recording)
 class StreamStatus(TypedDict):
     """Streaming status information."""
+
     output_active: bool
     output_reconnecting: bool
     output_timecode: str
@@ -197,6 +221,7 @@ class StreamStatus(TypedDict):
 
 class RecordingStatus(TypedDict):
     """Recording status information."""
+
     output_active: bool
     output_paused: bool
     output_timecode: str
@@ -206,11 +231,13 @@ class RecordingStatus(TypedDict):
 
 class RecordingInfo(TypedDict):
     """Recording information with file path."""
+
     output_path: str
 
 
 class OutputInfo(TypedDict):
     """Generic output information."""
+
     output_name: str
     output_kind: str
     output_active: bool
@@ -219,12 +246,14 @@ class OutputInfo(TypedDict):
 
 class OutputList(TypedDict):
     """List of outputs."""
+
     outputs: List[OutputInfo]
 
 
 # Media and Replay Buffer Types
 class MediaInputStatus(TypedDict):
     """Media input status."""
+
     media_state: str  # "playing", "paused", "stopped", "ended", "error"
     media_duration: NotRequired[Milliseconds]
     media_cursor: NotRequired[Milliseconds]
@@ -232,51 +261,60 @@ class MediaInputStatus(TypedDict):
 
 class ReplayBufferStatus(TypedDict):
     """Replay buffer status."""
+
     output_active: bool
 
 
 class ReplayBufferSaved(TypedDict):
     """Replay buffer save information."""
+
     saved_replay_path: str
 
 
 # Hotkey Types
 class HotkeyInfo(TypedDict):
     """Hotkey information."""
+
     hotkey_name: str
     hotkey_keys: List[str]
 
 
 class HotkeyList(TypedDict):
     """List of hotkeys."""
+
     hotkeys: List[HotkeyInfo]
 
 
 # Studio Mode Types
 class StudioModeInfo(TypedDict):
     """Studio mode status."""
+
     studio_mode_enabled: bool
 
 
 # Profile and Scene Collection Types
 class ProfileInfo(TypedDict):
     """Profile information."""
+
     profile_name: str
 
 
 class ProfileList(TypedDict):
     """List of profiles."""
+
     current_profile_name: str
     profiles: List[str]
 
 
 class SceneCollectionInfo(TypedDict):
     """Scene collection information."""
+
     scene_collection_name: str
 
 
 class SceneCollectionList(TypedDict):
     """List of scene collections."""
+
     current_scene_collection_name: str
     scene_collections: List[str]
 
@@ -284,6 +322,7 @@ class SceneCollectionList(TypedDict):
 # Screenshot Types
 class ScreenshotInfo(TypedDict):
     """Screenshot information."""
+
     image_data: str  # Base64 encoded
     image_format: str  # "png", "jpg", etc.
 
@@ -291,12 +330,14 @@ class ScreenshotInfo(TypedDict):
 # Virtual Camera Types
 class VirtualCameraStatus(TypedDict):
     """Virtual camera status."""
+
     output_active: bool
 
 
 # Monitor Types
 class MonitorInfo(TypedDict):
     """Monitor information."""
+
     monitor_index: int
     monitor_name: str
     monitor_width: int
@@ -305,12 +346,14 @@ class MonitorInfo(TypedDict):
 
 class MonitorList(TypedDict):
     """List of monitors."""
+
     monitors: List[MonitorInfo]
 
 
 # Custom types for specific operations
 class BulkSceneItemOperation(TypedDict):
     """Bulk scene item operation result."""
+
     scene_item_id: int
     success: bool
     error: NotRequired[str]
@@ -318,6 +361,7 @@ class BulkSceneItemOperation(TypedDict):
 
 class BulkOperationResult(TypedDict):
     """Result of bulk operations."""
+
     results: List[BulkSceneItemOperation]
     total_count: int
     success_count: int
@@ -327,6 +371,7 @@ class BulkOperationResult(TypedDict):
 # WebSocket Event Types (for event data)
 class EventData(TypedDict, total=False):
     """Base event data structure."""
+
     event_type: str
     event_intent: int
     event_data: Dict[str, Any]
@@ -335,6 +380,7 @@ class EventData(TypedDict, total=False):
 # Request/Response wrapper types
 class OBSRequest(TypedDict):
     """OBS WebSocket request structure."""
+
     request_type: str
     request_id: str
     request_data: NotRequired[Dict[str, Any]]
@@ -342,6 +388,7 @@ class OBSRequest(TypedDict):
 
 class OBSResponse(TypedDict):
     """OBS WebSocket response structure."""
+
     request_type: str
     request_id: str
     request_status: Dict[str, Any]
@@ -350,6 +397,7 @@ class OBSResponse(TypedDict):
 
 class OBSEvent(TypedDict):
     """OBS WebSocket event structure."""
+
     event_type: str
     event_intent: int
     event_data: Dict[str, Any]
@@ -357,8 +405,8 @@ class OBSEvent(TypedDict):
 
 # Union types for common response patterns
 SceneItemReference = Union[int, str]  # Can be ID or name
-SourceReference = Union[str, UUID]    # Can be name or UUID
-SceneReference = Union[str, UUID]     # Can be name or UUID
+SourceReference = Union[str, UUID]  # Can be name or UUID
+SceneReference = Union[str, UUID]  # Can be name or UUID
 
 # Complete response type mapping
 OBSResponseData = Union[
