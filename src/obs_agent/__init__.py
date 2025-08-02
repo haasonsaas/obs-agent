@@ -54,6 +54,16 @@ except ImportError:
 # New improved modules
 from .obs_agent_v2 import OBSAgent as OBSAgentV2
 from .obs_agent_v2 import create_obs_agent
+
+# Type-safe wrapper
+try:
+    from .typed_obs_agent import TypedOBSAgent, create_typed_obs_agent
+except ImportError:
+    TypedOBSAgent = None  # type: ignore
+    create_typed_obs_agent = None  # type: ignore
+
+# Type definitions
+from . import types
 from .validation import (
     validate_file_path,
     validate_host,
@@ -77,6 +87,11 @@ __all__ = [
     # New improved classes
     "OBSAgentV2",
     "create_obs_agent",
+    # Type-safe classes
+    "TypedOBSAgent", 
+    "create_typed_obs_agent",
+    # Type definitions
+    "types",
     # Configuration
     "Config",
     "OBSConfig",
