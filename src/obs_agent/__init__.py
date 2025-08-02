@@ -6,7 +6,7 @@ from .config import Config, LoggingConfig, OBSConfig, StreamingConfig, get_confi
 from .connection import ConnectionManager, get_connection_manager, obs_connection
 
 # Event system
-from .events import (  # Event classes; Middleware
+from .event_handler import (  # Event classes; Middleware
     BaseEvent,
     CurrentProgramSceneChanged,
     EventCategory,

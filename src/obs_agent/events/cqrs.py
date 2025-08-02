@@ -7,7 +7,6 @@ for separating write and read operations in the event-sourced system.
 
 import asyncio
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Type, Union, Callable
 from uuid import UUID, uuid4
@@ -16,14 +15,14 @@ from .domain import DomainEvent, EventMetadata, SceneSwitched, StreamStarted
 from .store import EventStore
 
 
-@dataclass
 class Command(ABC):
     """Base class for all commands."""
     
-    command_id: UUID = field(default_factory=uuid4)
-    timestamp: datetime = field(default_factory=datetime.utcnow)
-    correlation_id: Optional[UUID] = None
-    user_id: Optional[str] = None
+    def __init__(self):
+        self.command_id: UUID = uuid4()
+        self.timestamp: datetime = datetime.utcnow()
+        self.correlation_id: Optional[UUID] = None
+        self.user_id: Optional[str] = None
     
     @abstractmethod
     def get_aggregate_id(self) -> str:
@@ -31,64 +30,93 @@ class Command(ABC):
         pass
 
 
-@dataclass
 class Query(ABC):
     """Base class for all queries."""
     
-    query_id: UUID = field(default_factory=uuid4)
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    def __init__(self):
+        self.query_id: UUID = uuid4()
+        self.timestamp: datetime = datetime.utcnow()
 
 
 # Commands
 
-@dataclass
 class SwitchScene(Command):
     """Command to switch the active scene."""
     
-    to_scene: str
-    transition_type: Optional[str] = None
-    transition_duration: Optional[int] = None
+    def __init__(self, to_scene: str, transition_type: Optional[str] = None, 
+                 transition_duration: Optional[int] = None, **kwargs):
+        super().__init__()
+        self.to_scene = to_scene
+        self.transition_type = transition_type
+        self.transition_duration = transition_duration
+        # Allow setting correlation_id and user_id via kwargs
+        if 'correlation_id' in kwargs:
+            self.correlation_id = kwargs['correlation_id']
+        if 'user_id' in kwargs:
+            self.user_id = kwargs['user_id']
     
     def get_aggregate_id(self) -> str:
         return "obs_system"
 
 
-@dataclass
 class StartStream(Command):
     """Command to start streaming."""
     
-    stream_settings: Dict[str, Any] = field(default_factory=dict)
-    service: Optional[str] = None
+    def __init__(self, stream_settings: Optional[Dict[str, Any]] = None, 
+                 service: Optional[str] = None, **kwargs):
+        super().__init__()
+        self.stream_settings = stream_settings or {}
+        self.service = service
+        if 'correlation_id' in kwargs:
+            self.correlation_id = kwargs['correlation_id']
+        if 'user_id' in kwargs:
+            self.user_id = kwargs['user_id']
     
     def get_aggregate_id(self) -> str:
         return "stream"
 
 
-@dataclass
 class StopStream(Command):
     """Command to stop streaming."""
     
+    def __init__(self, **kwargs):
+        super().__init__()
+        if 'correlation_id' in kwargs:
+            self.correlation_id = kwargs['correlation_id']
+        if 'user_id' in kwargs:
+            self.user_id = kwargs['user_id']
+    
     def get_aggregate_id(self) -> str:
         return "stream"
 
 
-@dataclass
 class CreateScene(Command):
     """Command to create a new scene."""
     
-    scene_name: str
-    scene_settings: Dict[str, Any] = field(default_factory=dict)
+    def __init__(self, scene_name: str, scene_settings: Optional[Dict[str, Any]] = None, **kwargs):
+        super().__init__()
+        self.scene_name = scene_name
+        self.scene_settings = scene_settings or {}
+        if 'correlation_id' in kwargs:
+            self.correlation_id = kwargs['correlation_id']
+        if 'user_id' in kwargs:
+            self.user_id = kwargs['user_id']
     
     def get_aggregate_id(self) -> str:
         return f"scene:{self.scene_name}"
 
 
-@dataclass
 class SetSourceVolume(Command):
     """Command to set source volume."""
     
-    source_name: str
-    volume: float
+    def __init__(self, source_name: str, volume: float, **kwargs):
+        super().__init__()
+        self.source_name = source_name
+        self.volume = volume
+        if 'correlation_id' in kwargs:
+            self.correlation_id = kwargs['correlation_id']
+        if 'user_id' in kwargs:
+            self.user_id = kwargs['user_id']
     
     def get_aggregate_id(self) -> str:
         return f"source:{self.source_name}"
@@ -96,40 +124,42 @@ class SetSourceVolume(Command):
 
 # Queries
 
-@dataclass
 class GetCurrentScene(Query):
     """Query to get the current active scene."""
     pass
 
 
-@dataclass
 class GetStreamStatus(Query):
     """Query to get streaming status."""
     pass
 
 
-@dataclass
 class GetSceneList(Query):
     """Query to get all scenes."""
     pass
 
 
-@dataclass
 class GetEventHistory(Query):
     """Query to get event history."""
     
-    aggregate_id: Optional[str] = None
-    since: Optional[datetime] = None
-    until: Optional[datetime] = None
-    limit: Optional[int] = None
+    def __init__(self, aggregate_id: Optional[str] = None, 
+                 since: Optional[datetime] = None,
+                 until: Optional[datetime] = None,
+                 limit: Optional[int] = None):
+        super().__init__()
+        self.aggregate_id = aggregate_id
+        self.since = since
+        self.until = until
+        self.limit = limit
 
 
-@dataclass
 class GetAggregateState(Query):
     """Query to get the current state of an aggregate."""
     
-    aggregate_id: str
-    at_timestamp: Optional[datetime] = None
+    def __init__(self, aggregate_id: str, at_timestamp: Optional[datetime] = None):
+        super().__init__()
+        self.aggregate_id = aggregate_id
+        self.at_timestamp = at_timestamp
 
 
 # Command Handlers

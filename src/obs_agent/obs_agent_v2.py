@@ -16,7 +16,7 @@ from .actions import ActionBuilder, SmartActions
 from .automation import AutomationDecorator, AutomationEngine
 from .config import Config, get_config
 from .connection import ConnectionManager, get_connection_manager
-from .events import EventHandler
+from .event_handler import EventHandler
 from .exceptions import (
     RecordingAlreadyActiveError,
     RecordingNotActiveError,

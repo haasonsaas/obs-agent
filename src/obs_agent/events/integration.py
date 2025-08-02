@@ -7,12 +7,13 @@ and the existing OBS Agent functionality.
 
 import asyncio
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Dict, List, Optional, Callable, TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from ..obs_agent_v2 import OBSAgent
+if TYPE_CHECKING:
+    from ..obs_agent_v2 import OBSAgent
 from .domain import (
     DomainEvent, EventMetadata, EventType,
     SceneCreated, SceneSwitched, SourceCreated,
@@ -21,7 +22,7 @@ from .domain import (
 )
 from .store import EventStore
 from .cqrs import CommandBus, QueryBus, ReadModel
-from .time_travel import TimeTravelDebugger
+from .time_travel import TimeTravelDebugger, DebugSession
 from .projections import ProjectionBuilder
 
 
@@ -49,7 +50,7 @@ class EventSourcingSystem:
     - Integrates with automation rules
     """
     
-    def __init__(self, obs_agent: OBSAgent, config: Optional[EventSourcingConfig] = None):
+    def __init__(self, obs_agent: "OBSAgent", config: Optional[EventSourcingConfig] = None):
         self.obs_agent = obs_agent
         self.config = config or EventSourcingConfig()
         

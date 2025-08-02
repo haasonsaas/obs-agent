@@ -30,7 +30,7 @@ from enum import Enum, auto
 from functools import wraps
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Set, Type, Union
 
-from .events import BaseEvent
+from .event_handler import BaseEvent
 from .logging import get_logger
 
 logger = get_logger(__name__)

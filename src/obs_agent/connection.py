@@ -19,7 +19,7 @@ import obswebsocket.exceptions
 from obswebsocket import obsws, requests
 
 from .config import OBSConfig, get_config
-from .events import EventHandler
+from .event_handler import EventHandler
 from .exceptions import AuthenticationError, ConnectionError, RequestTimeoutError, handle_obs_error
 
 logger = logging.getLogger(__name__)
