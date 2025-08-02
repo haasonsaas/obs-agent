@@ -44,6 +44,7 @@ from .exceptions import (
     handle_obs_error,
 )
 from .logging import get_logger, log_context, setup_logging
+
 try:
     from .obs_agent import OBSAgent, OBSController
 except ImportError:

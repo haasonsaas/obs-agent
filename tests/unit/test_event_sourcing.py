@@ -519,9 +519,10 @@ class TestTimeTravelDebugger:
         event_store.append(SceneSwitched(aggregate_id="obs_system", from_scene="Unknown", to_scene="Scene 1"))
 
         session = debugger.start_session()
-        
+
         # Move debugger position to the end to include all events
         import datetime
+
         debugger.goto(datetime.datetime.utcnow() + datetime.timedelta(seconds=1))
 
         # What if we switched to a different scene?
@@ -530,12 +531,14 @@ class TestTimeTravelDebugger:
             for event in events:
                 if isinstance(event, SceneSwitched):
                     # Replace with alternative scene switch
-                    modified.append(SceneSwitched(
-                        aggregate_id="obs_system",
-                        from_scene="Unknown",
-                        to_scene="Alternative Scene",
-                        metadata=event.metadata
-                    ))
+                    modified.append(
+                        SceneSwitched(
+                            aggregate_id="obs_system",
+                            from_scene="Unknown",
+                            to_scene="Alternative Scene",
+                            metadata=event.metadata,
+                        )
+                    )
                 else:
                     modified.append(event)
             return modified
@@ -543,8 +546,9 @@ class TestTimeTravelDebugger:
         state = debugger.what_if(modify_events)
         # Debug: Check if events were modified correctly
         modified = modify_events(session.events_in_range)
-        assert any(isinstance(e, SceneSwitched) and e.to_scene == "Alternative Scene" for e in modified), \
-            f"No modified SceneSwitched event found. Events: {[type(e).__name__ for e in modified]}"
+        assert any(
+            isinstance(e, SceneSwitched) and e.to_scene == "Alternative Scene" for e in modified
+        ), f"No modified SceneSwitched event found. Events: {[type(e).__name__ for e in modified]}"
         assert state["current_scene"] == "Alternative Scene"
 
     def test_find_event_pattern(self, debugger_setup):
