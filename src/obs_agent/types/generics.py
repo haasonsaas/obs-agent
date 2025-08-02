@@ -17,6 +17,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
     overload,
     runtime_checkable,
 )
@@ -194,8 +195,8 @@ class TypedResult(Generic[T]):
         self.data = data
         self.error = error
 
-    def is_success(self) -> TypeGuard[T]:
-        """Check if result is successful with type guard."""
+    def is_success(self) -> bool:
+        """Check if result is successful."""
         return self.success and self.data is not None
 
     def unwrap(self) -> T:
@@ -252,7 +253,9 @@ def create_typed_handler(
     event_type: Type[EventT], handler: Union[Callable[[EventT], None], Callable[[EventT], Awaitable[None]]]
 ) -> TypedEventHandler[EventT]:
     """Create a typed event handler with proper overloads."""
-    return TypedEventHandler(event_type, handler)
+    # Cast the handler to the protocol type
+    protocol_handler = cast(EventHandlerProtocol[EventT], handler)
+    return TypedEventHandler(event_type, protocol_handler)
 
 
 @overload
@@ -292,7 +295,8 @@ def safe_cast(value: Any, target_type: Type[T]) -> Optional[T]:
     try:
         if isinstance(value, target_type):
             return value
-        return target_type(value)
+        # Try to cast/convert the value
+        return cast(T, target_type(value))  # type: ignore[call-arg]
     except (TypeError, ValueError):
         return None
 
@@ -330,6 +334,14 @@ class AsyncTypedResult(Generic[T]):
         self.success = success
         self.data = data
         self.error = error
+
+    def unwrap(self) -> T:
+        """Unwrap result data or raise exception."""
+        if not self.success:
+            raise ValueError(f"Operation failed: {self.error}")
+        if self.data is None:
+            raise ValueError("No data available")
+        return self.data
 
     async def unwrap_async(self) -> T:
         """Async unwrap - useful for chaining async operations."""

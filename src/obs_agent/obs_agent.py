@@ -43,6 +43,7 @@ class OBSAgent:
 
     async def get_version(self) -> Dict[str, Any]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetVersion())
         return {
             "obs_version": response.datain.get("obsVersion"),
@@ -53,17 +54,20 @@ class OBSAgent:
 
     async def get_scenes(self) -> List[str]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetSceneList())
         scenes = response.datain.get("scenes", [])
         return [scene["sceneName"] for scene in scenes]
 
     async def get_current_scene(self) -> str:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetCurrentProgramScene())
-        return response.datain.get("currentProgramSceneName", "")
+        return str(response.datain.get("currentProgramSceneName", ""))
 
     async def set_scene(self, scene_name: str) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.SetCurrentProgramScene(sceneName=scene_name))
             self.logger.info(f"Switched to scene: {scene_name}")
@@ -74,6 +78,7 @@ class OBSAgent:
 
     async def start_recording(self) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.StartRecord())
             self.logger.info("Recording started")
@@ -84,9 +89,10 @@ class OBSAgent:
 
     async def stop_recording(self) -> str:
         self._check_connection()
+        assert self.ws is not None
         try:
             response = self.ws.call(requests.StopRecord())
-            output_path = response.datain.get("outputPath", "")
+            output_path = str(response.datain.get("outputPath", ""))
             self.logger.info(f"Recording stopped. File saved to: {output_path}")
             return output_path
         except Exception as e:
@@ -95,6 +101,7 @@ class OBSAgent:
 
     async def toggle_recording(self) -> Dict[str, Any]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.ToggleRecord())
         return {
             "output_active": response.datain.get("outputActive", False),
@@ -103,6 +110,7 @@ class OBSAgent:
 
     async def get_recording_status(self) -> Dict[str, Any]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetRecordStatus())
         return {
             "is_recording": response.datain.get("outputActive", False),
@@ -113,6 +121,7 @@ class OBSAgent:
 
     async def start_streaming(self) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.StartStream())
             self.logger.info("Streaming started")
@@ -123,6 +132,7 @@ class OBSAgent:
 
     async def stop_streaming(self) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.StopStream())
             self.logger.info("Streaming stopped")
@@ -133,11 +143,13 @@ class OBSAgent:
 
     async def toggle_streaming(self) -> bool:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.ToggleStream())
-        return response.datain.get("outputActive", False)
+        return bool(response.datain.get("outputActive", False))
 
     async def get_streaming_status(self) -> Dict[str, Any]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetStreamStatus())
         return {
             "is_streaming": response.datain.get("outputActive", False),
@@ -149,16 +161,20 @@ class OBSAgent:
 
     async def get_sources(self) -> List[Dict[str, Any]]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetInputList())
-        return response.datain.get("inputs", [])
+        inputs = response.datain.get("inputs", [])
+        return list(inputs) if inputs else []
 
     async def get_source_settings(self, source_name: str) -> Dict[str, Any]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetInputSettings(inputName=source_name))
         return {"kind": response.datain.get("inputKind", ""), "settings": response.datain.get("inputSettings", {})}
 
     async def set_source_settings(self, source_name: str, settings: Dict[str, Any]) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.SetInputSettings(inputName=source_name, inputSettings=settings))
             self.logger.info(f"Updated settings for source: {source_name}")
@@ -169,11 +185,13 @@ class OBSAgent:
 
     async def get_source_mute(self, source_name: str) -> bool:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetInputMute(inputName=source_name))
-        return response.datain.get("inputMuted", False)
+        return bool(response.datain.get("inputMuted", False))
 
     async def set_source_mute(self, source_name: str, muted: bool) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.SetInputMute(inputName=source_name, inputMuted=muted))
             self.logger.info(f"Set mute for {source_name} to {muted}")
@@ -184,15 +202,17 @@ class OBSAgent:
 
     async def toggle_source_mute(self, source_name: str) -> bool:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.ToggleInputMute(inputName=source_name))
-        return response.datain.get("inputMuted", False)
+        return bool(response.datain.get("inputMuted", False))
 
     async def get_source_volume(self, source_name: str) -> Dict[str, float]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetInputVolume(inputName=source_name))
         return {
-            "volume_mul": response.datain.get("inputVolumeMul", 0.0),
-            "volume_db": response.datain.get("inputVolumeDb", 0.0),
+            "volume_mul": float(response.datain.get("inputVolumeMul", 0.0)),
+            "volume_db": float(response.datain.get("inputVolumeDb", 0.0)),
         }
 
     async def set_source_volume(
@@ -200,12 +220,13 @@ class OBSAgent:
     ) -> bool:
         self._check_connection()
         try:
-            params = {"inputName": source_name}
+            params: Dict[str, Any] = {"inputName": source_name}
             if volume_db is not None:
                 params["inputVolumeDb"] = volume_db
             if volume_mul is not None:
                 params["inputVolumeMul"] = volume_mul
 
+            assert self.ws is not None
             self.ws.call(requests.SetInputVolume(**params))
             self.logger.info(f"Set volume for {source_name}")
             return True
@@ -215,6 +236,7 @@ class OBSAgent:
 
     async def create_scene(self, scene_name: str) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.CreateScene(sceneName=scene_name))
             self.logger.info(f"Created scene: {scene_name}")
@@ -225,6 +247,7 @@ class OBSAgent:
 
     async def remove_scene(self, scene_name: str) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.RemoveScene(sceneName=scene_name))
             self.logger.info(f"Removed scene: {scene_name}")
@@ -238,12 +261,13 @@ class OBSAgent:
     ) -> bool:
         self._check_connection()
         try:
-            params = {"sourceName": source_name, "imageFilePath": file_path, "imageFormat": "png"}
+            params: Dict[str, Any] = {"sourceName": source_name, "imageFilePath": file_path, "imageFormat": "png"}
             if width:
                 params["imageWidth"] = width
             if height:
                 params["imageHeight"] = height
 
+            assert self.ws is not None
             self.ws.call(requests.SaveSourceScreenshot(**params))
             self.logger.info(f"Screenshot saved to: {file_path}")
             return True
@@ -253,11 +277,13 @@ class OBSAgent:
 
     async def get_stats(self) -> Dict[str, Any]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetStats())
-        return response.datain
+        return dict(response.datain)
 
     async def set_transition(self, transition_name: str) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.SetCurrentSceneTransition(transitionName=transition_name))
             self.logger.info(f"Set transition to: {transition_name}")
@@ -268,12 +294,14 @@ class OBSAgent:
 
     async def get_transitions(self) -> List[str]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetSceneTransitionList())
         transitions = response.datain.get("transitions", [])
         return [t["transitionName"] for t in transitions]
 
     async def set_transition_duration(self, duration_ms: int) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.SetCurrentSceneTransitionDuration(transitionDuration=duration_ms))
             self.logger.info(f"Set transition duration to: {duration_ms}ms")
@@ -284,11 +312,14 @@ class OBSAgent:
 
     async def get_scene_items(self, scene_name: str) -> List[Dict[str, Any]]:
         self._check_connection()
+        assert self.ws is not None
         response = self.ws.call(requests.GetSceneItemList(sceneName=scene_name))
-        return response.datain.get("sceneItems", [])
+        items = response.datain.get("sceneItems", [])
+        return list(items) if items else []
 
     async def set_scene_item_enabled(self, scene_name: str, item_id: int, enabled: bool) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(
                 requests.SetSceneItemEnabled(sceneName=scene_name, sceneItemId=item_id, sceneItemEnabled=enabled)
@@ -304,20 +335,22 @@ class OBSAgent:
     ) -> int:
         self._check_connection()
         try:
-            params = {"sceneName": scene_name, "inputName": source_name, "inputKind": source_kind}
+            params: Dict[str, Any] = {"sceneName": scene_name, "inputName": source_name, "inputKind": source_kind}
             if settings:
                 params["inputSettings"] = settings
 
+            assert self.ws is not None
             response = self.ws.call(requests.CreateInput(**params))
             item_id = response.datain.get("sceneItemId", -1)
             self.logger.info(f"Created source {source_name} with ID {item_id}")
-            return item_id
+            return int(item_id) if item_id is not None else -1
         except Exception as e:
             self.logger.error(f"Failed to create source: {e}")
             return -1
 
     async def remove_source(self, source_name: str) -> bool:
         self._check_connection()
+        assert self.ws is not None
         try:
             self.ws.call(requests.RemoveInput(inputName=source_name))
             self.logger.info(f"Removed source: {source_name}")
@@ -361,7 +394,7 @@ class OBSController:
             scene_name = schedule.get("scene")
             duration = schedule.get("duration", 10)
 
-            if await self.agent.set_scene(scene_name):
+            if scene_name and await self.agent.set_scene(scene_name):
                 await asyncio.sleep(duration)
 
     async def monitor_stream_health(self, alert_callback: Optional[Callable] = None):
@@ -380,11 +413,12 @@ class OBSController:
 
     async def backup_scenes(self, backup_path: str = "obs_backup.json"):
         scenes = await self.agent.get_scenes()
-        backup_data = {"timestamp": datetime.now().isoformat(), "scenes": []}
+        backup_data: Dict[str, Any] = {"timestamp": datetime.now().isoformat(), "scenes": []}
 
         for scene_name in scenes:
             scene_items = await self.agent.get_scene_items(scene_name)
-            backup_data["scenes"].append({"name": scene_name, "items": scene_items})
+            scene_dict: Dict[str, Any] = {"name": scene_name, "items": scene_items}
+            backup_data["scenes"].append(scene_dict)
 
         with open(backup_path, "w") as f:
             json.dump(backup_data, f, indent=2)

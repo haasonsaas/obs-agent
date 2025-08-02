@@ -374,13 +374,14 @@ def validate_settings(settings: Dict[str, Any], allowed_keys: Optional[List[str]
             )
 
     # Recursively validate nested dictionaries
-    validated = {}
+    validated: Dict[str, Any] = {}
     for key, value in settings.items():
         if isinstance(value, dict):
             validated[key] = validate_settings(value)
         elif isinstance(value, str):
             # Sanitize string values
-            validated[key] = sanitize_string(value, max_length=MAX_TEXT_LENGTH, pattern=None)
+            sanitized: Any = sanitize_string(value, max_length=MAX_TEXT_LENGTH, pattern=None)
+            validated[key] = sanitized
         else:
             validated[key] = value
 

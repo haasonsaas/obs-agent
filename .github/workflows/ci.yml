@@ -49,11 +49,9 @@ jobs:
       run: |
         isort --check-only src tests
     
-    # Temporarily disabled - MyPy type checking
-    # TODO: Re-enable after completing gradual typing migration
-    # - name: Type check with mypy
-    #   run: |
-    #     mypy src
+    - name: Type check with mypy
+      run: |
+        mypy src --ignore-missing-imports
 
   test:
     runs-on: ${{ matrix.os }}

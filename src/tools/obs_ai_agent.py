@@ -417,7 +417,7 @@ class RulesEngine:
     """Rule-based decision engine for common scenarios"""
 
     def __init__(self):
-        self.rules = [
+        self.rules: List[Dict[str, Any]] = [
             {
                 "name": "no_audio_emergency",
                 "condition": lambda state, events: StreamEvent.NO_AUDIO in events,
@@ -455,7 +455,7 @@ class OBSAgentOrchestrator:
 
     def __init__(self, password: str = ""):
         self.obs = AdvancedOBSAgent(password=password)
-        self.agent = None
+        self.agent: Optional[OBSAIAgent] = None
         self.logger = logging.getLogger(__name__)
 
     async def start_autonomous_stream(self, goals: List[StreamGoal], duration_hours: float = 2.0):

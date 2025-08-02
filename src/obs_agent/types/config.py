@@ -5,6 +5,7 @@ This module provides Pydantic models for configuration validation
 and TypedDict definitions for configuration structures.
 """
 
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 from typing_extensions import NotRequired, TypedDict
@@ -172,7 +173,7 @@ try:
     class OBSConnectionConfigModel(BaseModel):
         """Pydantic model for OBS connection configuration."""
 
-        host: constr(min_length=1) = "localhost"
+        host: str = Field("localhost", min_length=1)
         port: PositiveInt = 4455
         password: str = ""
         timeout: float = Field(30.0, gt=0)
@@ -268,11 +269,11 @@ try:
         """Complete Pydantic model for OBS Agent configuration."""
 
         obs: OBSConnectionConfigModel
-        logging: LoggingConfigModel = Field(default_factory=LoggingConfigModel)
-        streaming: StreamingConfigModel = Field(default_factory=StreamingConfigModel)
-        recording: RecordingConfigModel = Field(default_factory=RecordingConfigModel)
-        automation: AutomationConfigModel = Field(default_factory=AutomationConfigModel)
-        security: SecurityConfigModel = Field(default_factory=SecurityConfigModel)
+        logging: LoggingConfigModel = Field(default_factory=lambda: LoggingConfigModel())
+        streaming: StreamingConfigModel = Field(default_factory=lambda: StreamingConfigModel())
+        recording: RecordingConfigModel = Field(default_factory=lambda: RecordingConfigModel())
+        automation: AutomationConfigModel = Field(default_factory=lambda: AutomationConfigModel())
+        security: SecurityConfigModel = Field(default_factory=lambda: SecurityConfigModel())
 
         class Config:
             extra = "forbid"  # Don't allow extra fields
@@ -289,13 +290,13 @@ try:
 
 except ImportError:
     # Pydantic not available, use None placeholders
-    ValidatedOBSConfig = None
-    ValidatedLoggingConfig = None
-    ValidatedStreamingConfig = None
-    ValidatedRecordingConfig = None
-    ValidatedAutomationConfig = None
-    ValidatedSecurityConfig = None
-    ValidatedOBSAgentConfig = None
+    ValidatedOBSConfig = None  # type: ignore[assignment]
+    ValidatedLoggingConfig = None  # type: ignore[assignment]
+    ValidatedStreamingConfig = None  # type: ignore[assignment]
+    ValidatedRecordingConfig = None  # type: ignore[assignment]
+    ValidatedAutomationConfig = None  # type: ignore[assignment]
+    ValidatedSecurityConfig = None  # type: ignore[assignment]
+    ValidatedOBSAgentConfig = None  # type: ignore[assignment]
 
 
 # Default configurations
@@ -368,7 +369,7 @@ DEFAULT_PERFORMANCE_CONFIG: PerformanceConfig = {
 
 DEFAULT_OBS_AGENT_CONFIG: OBSAgentConfig = {
     "version": "2.0.0",
-    "created_at": 0.0,  # Will be set at runtime
+    "created_at": datetime.now().timestamp(),
     "obs": DEFAULT_OBS_CONFIG,
     "logging": DEFAULT_LOGGING_CONFIG,
     "streaming": DEFAULT_STREAMING_CONFIG,
@@ -411,7 +412,7 @@ def validate_config(config: Dict[str, Any]) -> Union[OBSAgentConfig, Dict[str, s
         if errors:
             return errors
 
-        return config  # type: ignore
+        return config
 
     try:
         validated = ValidatedOBSAgentConfig(**config)
@@ -430,7 +431,7 @@ def merge_configs(*configs: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         Merged configuration dictionary
     """
-    result = {}
+    result: Dict[str, Any] = {}
 
     for config in configs:
         for key, value in config.items():

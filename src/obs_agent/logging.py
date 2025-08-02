@@ -11,7 +11,7 @@ import logging.handlers
 import sys
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, MutableMapping, Optional
 
 from .config import LoggingConfig, get_config
 
@@ -326,7 +326,7 @@ class LoggerAdapter(logging.LoggerAdapter):
         logger.info("Starting component")
     """
 
-    def process(self, msg: str, kwargs: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
+    def process(self, msg: str, kwargs: MutableMapping[str, Any]) -> tuple[str, MutableMapping[str, Any]]:
         """Process the logging message and keyword arguments."""
         # Add extra context to all log messages
         extra = kwargs.get("extra", {})
