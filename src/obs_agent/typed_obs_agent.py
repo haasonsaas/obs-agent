@@ -7,7 +7,19 @@ type safety, validation, and better type inference for all operations.
 
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, AsyncContextManager, AsyncIterator, Callable, Dict, List, Literal, Optional, Union, cast, overload
+from typing import (
+    Any,
+    AsyncContextManager,
+    AsyncIterator,
+    Callable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Union,
+    cast,
+    overload,
+)
 
 from .config import Config
 from .obs_agent_v2 import OBSAgent as BaseOBSAgent
