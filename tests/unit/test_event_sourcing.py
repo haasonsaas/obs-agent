@@ -522,17 +522,18 @@ class TestTimeTravelDebugger:
 
         # What if we switched to a different scene?
         def modify_events(events):
-            modified = events.copy()
-            # Replace the switch event
-            if len(modified) > 1 and isinstance(modified[-1], SceneSwitched):
-                # Keep original metadata but change the scene
-                original = modified[-1]
-                modified[-1] = SceneSwitched(
-                    aggregate_id="obs_system", 
-                    from_scene="Unknown", 
-                    to_scene="Alternative Scene",
-                    metadata=original.metadata
-                )
+            modified = []
+            for event in events:
+                if isinstance(event, SceneSwitched):
+                    # Replace with alternative scene switch
+                    modified.append(SceneSwitched(
+                        aggregate_id="obs_system",
+                        from_scene="Unknown",
+                        to_scene="Alternative Scene",
+                        metadata=event.metadata
+                    ))
+                else:
+                    modified.append(event)
             return modified
 
         state = debugger.what_if(modify_events)

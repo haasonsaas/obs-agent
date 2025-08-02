@@ -51,7 +51,8 @@
       "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_event_sourcing.py -x --tb=short)",
       "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_event_sourcing.py::TestTimeTravelDebugger::test_start_debug_session -xvs)",
       "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_event_sourcing.py --tb=short -q)",
-      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/ -q)"
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/ -q)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_event_sourcing.py::TestTimeTravelDebugger::test_what_if_scenario -xvs)"
     ],
     "deny": []
   }
