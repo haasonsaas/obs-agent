@@ -9,12 +9,16 @@ import asyncio
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 from uuid import UUID, uuid4
 
 if TYPE_CHECKING:
     from ..obs_agent_v2 import OBSAgent
+
+from .cqrs import CommandBus, QueryBus, ReadModel
 from .domain import (
+    AutomationRuleExecuted,
+    AutomationRuleTriggered,
     DomainEvent,
     EventMetadata,
     EventType,
@@ -23,13 +27,10 @@ from .domain import (
     SourceCreated,
     StreamStarted,
     StreamStopped,
-    AutomationRuleTriggered,
-    AutomationRuleExecuted,
 )
-from .store import EventStore
-from .cqrs import CommandBus, QueryBus, ReadModel
-from .time_travel import TimeTravelDebugger, DebugSession
 from .projections import ProjectionBuilder
+from .store import EventStore
+from .time_travel import DebugSession, TimeTravelDebugger
 
 
 @dataclass

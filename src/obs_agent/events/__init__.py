@@ -9,59 +9,54 @@ This package provides a complete event sourcing implementation with:
 - Event projections and read models
 """
 
+from .cqrs import (
+    Command,
+    CommandBus,
+    GetCurrentScene,
+    GetEventHistory,
+    GetStreamStatus,
+    Query,
+    QueryBus,
+    ReadModel,
+    StartStream,
+    StopStream,
+    SwitchScene,
+)
 from .domain import (
+    AutomationRuleExecuted,
+    AutomationRuleTriggered,
     DomainEvent,
-    EventType,
     EventMetadata,
+    EventType,
     SceneCreated,
     SceneSwitched,
     SourceCreated,
     SourceVolumeChanged,
     StreamStarted,
     StreamStopped,
-    AutomationRuleTriggered,
-    AutomationRuleExecuted,
 )
-
+from .integration import (
+    EventSourcingConfig,
+    EventSourcingSystem,
+)
+from .projections import (
+    AutomationProjection,
+    PerformanceProjection,
+    Projection,
+    ProjectionBuilder,
+    ProjectionState,
+    SceneProjection,
+    StreamingProjection,
+)
 from .store import (
     EventStore,
     EventStream,
     Snapshot,
 )
-
-from .cqrs import (
-    Command,
-    Query,
-    CommandBus,
-    QueryBus,
-    ReadModel,
-    SwitchScene,
-    StartStream,
-    StopStream,
-    GetCurrentScene,
-    GetStreamStatus,
-    GetEventHistory,
-)
-
 from .time_travel import (
-    TimeTravelDebugger,
-    TimePoint,
     DebugSession,
-)
-
-from .projections import (
-    Projection,
-    ProjectionState,
-    ProjectionBuilder,
-    SceneProjection,
-    StreamingProjection,
-    AutomationProjection,
-    PerformanceProjection,
-)
-
-from .integration import (
-    EventSourcingSystem,
-    EventSourcingConfig,
+    TimePoint,
+    TimeTravelDebugger,
 )
 
 __all__ = [

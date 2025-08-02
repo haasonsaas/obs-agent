@@ -17,7 +17,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, AsyncIterator
+from typing import Any, AsyncIterator, Callable, Dict, List, Optional, Set, Tuple, Type
 from uuid import UUID
 
 from .domain import DomainEvent, EventMetadata, EventType

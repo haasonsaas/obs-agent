@@ -10,11 +10,10 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Set, Callable, TypeVar, Generic
+from typing import Any, Callable, Dict, Generic, List, Optional, Set, TypeVar
 
 from .domain import DomainEvent, EventType
 from .store import EventStore
-
 
 T = TypeVar("T")
 

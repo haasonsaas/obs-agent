@@ -8,7 +8,7 @@ for separating write and read operations in the event-sourced system.
 import asyncio
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Type, Union, Callable
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 from uuid import UUID, uuid4
 
 from .domain import DomainEvent, EventMetadata, SceneSwitched, StreamStarted

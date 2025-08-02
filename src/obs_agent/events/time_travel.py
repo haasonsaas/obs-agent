@@ -8,12 +8,12 @@ at any point in time, and debug automation rules with perfect reproducibility.
 import asyncio
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Set, Tuple, Callable
-from uuid import UUID
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from uuid import UUID, uuid4
 
 from .domain import DomainEvent, EventType
-from .store import EventStore, Snapshot
 from .projections import Projection, ProjectionBuilder
+from .store import EventStore, Snapshot
 
 
 @dataclass
@@ -73,7 +73,7 @@ class TimeTravelDebugger:
         events = self.event_store.replay_events(since=start_time, until=end_time)
 
         session = DebugSession(
-            session_id=UUID(),
+            session_id=uuid4(),
             start_time=start_time,
             end_time=end_time,
             current_position=start_time,

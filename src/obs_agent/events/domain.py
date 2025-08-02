@@ -5,13 +5,13 @@ This module defines all domain events that can occur in the OBS system.
 Each event is immutable and represents a fact that has happened.
 """
 
+import json
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Optional, List, Type
+from typing import Any, Dict, List, Optional, Type
 from uuid import UUID, uuid4
-import json
 
 
 class EventType(Enum):

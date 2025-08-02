@@ -9,43 +9,43 @@ import json
 import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 from uuid import UUID, uuid4
 
 import pytest
 
+from obs_agent.events.cqrs import (
+    Command,
+    CommandBus,
+    GetCurrentScene,
+    GetEventHistory,
+    Query,
+    QueryBus,
+    ReadModel,
+    StartStream,
+    SwitchScene,
+)
 from obs_agent.events.domain import (
+    AutomationRuleExecuted,
+    AutomationRuleTriggered,
     DomainEvent,
     EventMetadata,
     EventType,
     SceneCreated,
     SceneSwitched,
+    SourceCreated,
     StreamStarted,
     StreamStopped,
-    SourceCreated,
-    AutomationRuleTriggered,
-    AutomationRuleExecuted,
-)
-from obs_agent.events.store import EventStore, EventStream, Snapshot
-from obs_agent.events.cqrs import (
-    Command,
-    Query,
-    SwitchScene,
-    StartStream,
-    GetCurrentScene,
-    GetEventHistory,
-    CommandBus,
-    QueryBus,
-    ReadModel,
 )
 from obs_agent.events.projections import (
-    SceneProjection,
-    StreamingProjection,
     AutomationProjection,
     PerformanceProjection,
     ProjectionBuilder,
+    SceneProjection,
+    StreamingProjection,
 )
-from obs_agent.events.time_travel import TimeTravelDebugger, TimePoint
+from obs_agent.events.store import EventStore, EventStream, Snapshot
+from obs_agent.events.time_travel import TimePoint, TimeTravelDebugger
 
 
 class TestDomainEvents:
@@ -144,7 +144,7 @@ class TestEventStore:
     def test_get_events_by_type(self, event_store):
         """Test retrieving events by type."""
         for i in range(3):
-            event_store.append(SceneCreated(f"scene:{i}", scene_name=f"Scene {i}"))
+            event_store.append(SceneCreated(aggregate_id=f"scene:{i}", scene_name=f"Scene {i}"))
 
         event_store.append(StreamStarted(aggregate_id="stream", service="youtube"))
 
@@ -436,7 +436,7 @@ class TestTimeTravelDebugger:
 
         # Add some events
         for i in range(5):
-            event_store.append(SceneCreated(f"scene:{i}", scene_name=f"Scene {i}"))
+            event_store.append(SceneCreated(aggregate_id=f"scene:{i}", scene_name=f"Scene {i}"))
 
         session = debugger.start_session()
         assert session is not None
@@ -478,7 +478,7 @@ class TestTimeTravelDebugger:
 
         # Add events
         for i in range(3):
-            event_store.append(SceneCreated(f"scene:{i}", scene_name=f"Scene {i}"))
+            event_store.append(SceneCreated(aggregate_id=f"scene:{i}", scene_name=f"Scene {i}"))
 
         session = debugger.start_session()
 
@@ -498,7 +498,7 @@ class TestTimeTravelDebugger:
 
         # Add events
         for i in range(5):
-            event_store.append(SceneCreated(f"scene:{i}", scene_name=f"Scene {i}"))
+            event_store.append(SceneCreated(aggregate_id=f"scene:{i}", scene_name=f"Scene {i}"))
 
         event_store.append(StreamStarted(aggregate_id="stream", service="youtube"))
 
@@ -524,8 +524,15 @@ class TestTimeTravelDebugger:
         def modify_events(events):
             modified = events.copy()
             # Replace the switch event
-            if len(modified) > 1:
-                modified[-1] = SceneSwitched("obs_system", from_scene="Unknown", to_scene="Alternative Scene")
+            if len(modified) > 1 and isinstance(modified[-1], SceneSwitched):
+                # Keep original metadata but change the scene
+                original = modified[-1]
+                modified[-1] = SceneSwitched(
+                    aggregate_id="obs_system", 
+                    from_scene="Unknown", 
+                    to_scene="Alternative Scene",
+                    metadata=original.metadata
+                )
             return modified
 
         state = debugger.what_if(modify_events)
@@ -557,7 +564,7 @@ class TestTimeTravelDebugger:
 
         # Add various events
         for i in range(3):
-            event_store.append(SceneCreated(f"scene:{i}", scene_name=f"Scene {i}"))
+            event_store.append(SceneCreated(aggregate_id=f"scene:{i}", scene_name=f"Scene {i}"))
 
         event_store.append(StreamStarted(aggregate_id="stream", service="twitch"))
 
@@ -598,7 +605,7 @@ class TestAsyncOperations:
 
             # Add events
             for i in range(10):
-                event_store.append(SceneCreated(f"scene:{i}", scene_name=f"Scene {i}"))
+                event_store.append(SceneCreated(aggregate_id=f"scene:{i}", scene_name=f"Scene {i}"))
 
             # Stream events
             batches = []
