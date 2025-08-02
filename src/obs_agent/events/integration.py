@@ -232,7 +232,7 @@ class EventSourcingSystem:
                         self.event_store.append(failed_event)
                         raise
 
-                automation._trigger_rule = trigger_interceptor
+                automation._trigger_rule = trigger_interceptor  # type: ignore
 
     def start_correlation(self) -> UUID:
         """
@@ -271,13 +271,13 @@ class EventSourcingSystem:
         if self.projection_builder:
             stats["projections"] = {
                 name: projection.version for name, projection in self.projection_builder.projections.items()
-            }
+            }  # type: ignore
 
         if self.debugger and self.debugger.current_session:
             stats["debug_session"] = {
                 "events_in_range": len(self.debugger.current_session.events_in_range),
                 "breakpoints": len(self.debugger.current_session.breakpoints),
-            }
+            }  # type: ignore
 
         return stats
 
@@ -331,8 +331,9 @@ class EventSourcingSystem:
         for event in events:
             if event.event_type == EventType.AUTOMATION_RULE_TRIGGERED:
                 # Get all events in this correlation
-                correlation_events = self.event_store.get_correlation_chain(event.metadata.correlation_id)
-                related_events.extend(correlation_events)
+                if event.metadata.correlation_id:
+                    correlation_events = self.event_store.get_correlation_chain(event.metadata.correlation_id)
+                    related_events.extend(correlation_events)
 
         return events + related_events
 
