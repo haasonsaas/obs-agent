@@ -159,7 +159,7 @@ class EventSourcingSystem:
         """Set up interceptors for automation events."""
         if hasattr(self.obs_agent, "automation"):
             # Subscribe to automation events
-            automation = self.obs_agent.automation  # type: ignore
+            automation = self.obs_agent.automation
 
             # Track rule triggers
             original_trigger = automation._trigger_rule if hasattr(automation, "_trigger_rule") else None
@@ -215,6 +215,11 @@ class EventSourcingSystem:
 
                             def get_event_data(self) -> Dict[str, Any]:
                                 return {"error": self.error}
+                            
+                            @classmethod
+                            def from_event_data(cls, data: Dict[str, Any], **kwargs):
+                                """Deserialize from event data."""
+                                return cls(error=data["error"], **kwargs)
 
                         failed_event = AutomationRuleFailed(
                             aggregate_id=f"rule:{rule.id}",
