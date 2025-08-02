@@ -84,10 +84,12 @@ class ChatMessageReceived(DomainEvent):
     def __init__(self, message: ChatMessage, **kwargs):
         super().__init__(
             aggregate_id=f"chat:{message.platform}:{message.channel}",
-            event_type=EventType.CUSTOM,
             **kwargs
         )
         self.message = message
+    
+    def _get_event_type(self) -> EventType:
+        return EventType.CHAT_MESSAGE_RECEIVED
         
     def get_event_data(self) -> Dict[str, Any]:
         return {
@@ -102,6 +104,25 @@ class ChatMessageReceived(DomainEvent):
             "is_subscriber": self.message.is_subscriber,
             "badges": self.message.badges,
         }
+    
+    @classmethod
+    def from_event_data(cls, aggregate_id: str, metadata, data: Dict[str, Any]):
+        """Reconstruct event from stored data."""
+        from datetime import datetime
+        message = ChatMessage(
+            id=data["message_id"],
+            platform=data["platform"],
+            user_id=data["user_id"],
+            username=data["username"],
+            display_name=data["username"],  # Simplified
+            message=data["message"],
+            timestamp=datetime.fromisoformat(data["timestamp"]),
+            channel=data["channel"],
+            is_moderator=data["is_moderator"],
+            is_subscriber=data["is_subscriber"],
+            badges=data["badges"]
+        )
+        return cls(message=message, aggregate_id=aggregate_id, metadata=metadata)
 
 
 class ChatAnalysisCompleted(DomainEvent):
@@ -110,10 +131,12 @@ class ChatAnalysisCompleted(DomainEvent):
     def __init__(self, analysis: ChatAnalysis, **kwargs):
         super().__init__(
             aggregate_id=f"chat:analysis:{analysis.message_id}",
-            event_type=EventType.CUSTOM,
             **kwargs
         )
         self.analysis = analysis
+    
+    def _get_event_type(self) -> EventType:
+        return EventType.CHAT_ANALYSIS_COMPLETED
         
     def get_event_data(self) -> Dict[str, Any]:
         return {
@@ -127,6 +150,24 @@ class ChatAnalysisCompleted(DomainEvent):
             "urgency": self.analysis.urgency,
             "engagement_value": self.analysis.engagement_value,
         }
+    
+    @classmethod
+    def from_event_data(cls, aggregate_id: str, metadata, data: Dict[str, Any]):
+        """Reconstruct event from stored data."""
+        # This is a simplified reconstruction - in production you'd want
+        # to properly reconstruct the ChatAnalysis object
+        analysis = ChatAnalysis(
+            message_id=data["message_id"],
+            sentiment_score=data["sentiment_score"],
+            emotion=data["emotion"],
+            confidence=data["confidence"],
+            toxicity_score=data["toxicity_score"],
+            topics=data["topics"],
+            intent=data["intent"],
+            urgency=data["urgency"],
+            engagement_value=data["engagement_value"]
+        )
+        return cls(analysis=analysis, aggregate_id=aggregate_id, metadata=metadata)
 
 
 class EngagementMomentDetected(DomainEvent):
@@ -135,12 +176,14 @@ class EngagementMomentDetected(DomainEvent):
     def __init__(self, moment_type: str, intensity: float, context: Dict[str, Any], **kwargs):
         super().__init__(
             aggregate_id="chat:engagement",
-            event_type=EventType.CUSTOM,
             **kwargs
         )
         self.moment_type = moment_type
         self.intensity = intensity
         self.context = context
+    
+    def _get_event_type(self) -> EventType:
+        return EventType.CHAT_ENGAGEMENT_MOMENT
         
     def get_event_data(self) -> Dict[str, Any]:
         return {
@@ -148,6 +191,17 @@ class EngagementMomentDetected(DomainEvent):
             "intensity": self.intensity,
             "context": self.context,
         }
+    
+    @classmethod
+    def from_event_data(cls, aggregate_id: str, metadata, data: Dict[str, Any]):
+        """Reconstruct event from stored data."""
+        return cls(
+            moment_type=data["moment_type"],
+            intensity=data["intensity"],
+            context=data["context"],
+            aggregate_id=aggregate_id,
+            metadata=metadata
+        )
 
 
 # Chat Intelligence Engine
@@ -263,7 +317,7 @@ class ChatIntelligenceEngine:
         
         # Store event
         event = ChatAnalysisCompleted(analysis)
-        await self.event_store.append(event)
+        self.event_store.append(event)
         
         return analysis
     
@@ -272,7 +326,7 @@ class ChatIntelligenceEngine:
         
         # Store message event
         event = ChatMessageReceived(message)
-        await self.event_store.append(event)
+        self.event_store.append(event)
         
         # Add to buffer
         self.message_buffer.append(message)
@@ -318,7 +372,7 @@ class ChatIntelligenceEngine:
                     "timestamp": datetime.now().isoformat()
                 }
             )
-            await self.event_store.append(event)
+            self.event_store.append(event)
             logger.info(f"High engagement moment detected: {avg_engagement:.2f}")
         
         # Detect engagement drop
@@ -337,7 +391,7 @@ class ChatIntelligenceEngine:
                         "timestamp": datetime.now().isoformat()
                     }
                 )
-                await self.event_store.append(event)
+                self.event_store.append(event)
                 logger.warning(f"Engagement drop detected: {old_avg:.2f} -> {avg_engagement:.2f}")
     
     def get_engagement_stats(self) -> Dict[str, Any]:

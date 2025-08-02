@@ -59,6 +59,11 @@ class EventType(Enum):
     SYSTEM_ERROR = "system.error"
     SYSTEM_PERFORMANCE_WARNING = "system.performance_warning"
 
+    # Chat Intelligence events
+    CHAT_MESSAGE_RECEIVED = "chat.message_received"
+    CHAT_ANALYSIS_COMPLETED = "chat.analysis_completed"
+    CHAT_ENGAGEMENT_MOMENT = "chat.engagement_moment"
+
 
 @dataclass(frozen=True)
 class EventMetadata:

@@ -57,7 +57,8 @@
       "mcp__filesystem__create_directory",
       "Bash(chmod:*)",
       "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m mypy src/obs_agent/types/__init__.py --no-error-summary)",
-      "Bash(true)"
+      "Bash(true)",
+      "mcp__filesystem__list_allowed_directories"
     ],
     "deny": []
   }
