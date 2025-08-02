@@ -218,6 +218,7 @@ class TestConfig:
         with patch("obs_agent.config.Path.home", return_value=temp_dir):
             # Import Config fresh to get the patched home directory
             from importlib import reload
+
             import obs_agent.config
 
             reload(obs_agent.config)
