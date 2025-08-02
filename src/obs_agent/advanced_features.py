@@ -10,17 +10,22 @@ from .obs_agent import OBSAgent
 
 class AdvancedOBSAgent(OBSAgent):
 
-    async def get_filters(self, source_name: str) -> List[Dict[str, Any]]:
+    @property
+    def _ws(self):
+        """Get the WebSocket connection, ensuring it's connected."""
         self._check_connection()
-        response = self.ws.call(requests.GetSourceFilterList(sourceName=source_name))
+        assert self.ws is not None
+        return self.ws
+
+    async def get_filters(self, source_name: str) -> List[Dict[str, Any]]:
+        response = self._ws.call(requests.GetSourceFilterList(sourceName=source_name))
         return response.datain.get("filters", [])
 
     async def add_filter(
         self, source_name: str, filter_name: str, filter_kind: str, filter_settings: Dict[str, Any]
     ) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(
+            self._ws.call(
                 requests.CreateSourceFilter(
                     sourceName=source_name,
                     filterName=filter_name,
@@ -35,9 +40,8 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def remove_filter(self, source_name: str, filter_name: str) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.RemoveSourceFilter(sourceName=source_name, filterName=filter_name))
+            self._ws.call(requests.RemoveSourceFilter(sourceName=source_name, filterName=filter_name))
             self.logger.info(f"Removed filter {filter_name} from {source_name}")
             return True
         except Exception as e:
@@ -45,9 +49,8 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def set_filter_enabled(self, source_name: str, filter_name: str, enabled: bool) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(
+            self._ws.call(
                 requests.SetSourceFilterEnabled(sourceName=source_name, filterName=filter_name, filterEnabled=enabled)
             )
             self.logger.info(f"Set filter {filter_name} enabled to {enabled}")
@@ -57,14 +60,12 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def get_audio_monitor_type(self, source_name: str) -> str:
-        self._check_connection()
-        response = self.ws.call(requests.GetInputAudioMonitorType(inputName=source_name))
+        response = self._ws.call(requests.GetInputAudioMonitorType(inputName=source_name))
         return response.datain.get("monitorType", "")
 
     async def set_audio_monitor_type(self, source_name: str, monitor_type: str) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.SetInputAudioMonitorType(inputName=source_name, monitorType=monitor_type))
+            self._ws.call(requests.SetInputAudioMonitorType(inputName=source_name, monitorType=monitor_type))
             self.logger.info(f"Set audio monitor type for {source_name} to {monitor_type}")
             return True
         except Exception as e:
@@ -72,14 +73,12 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def get_audio_balance(self, source_name: str) -> float:
-        self._check_connection()
-        response = self.ws.call(requests.GetInputAudioBalance(inputName=source_name))
+        response = self._ws.call(requests.GetInputAudioBalance(inputName=source_name))
         return response.datain.get("inputAudioBalance", 0.5)
 
     async def set_audio_balance(self, source_name: str, balance: float) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.SetInputAudioBalance(inputName=source_name, inputAudioBalance=balance))
+            self._ws.call(requests.SetInputAudioBalance(inputName=source_name, inputAudioBalance=balance))
             self.logger.info(f"Set audio balance for {source_name} to {balance}")
             return True
         except Exception as e:
@@ -87,14 +86,12 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def get_audio_sync_offset(self, source_name: str) -> int:
-        self._check_connection()
-        response = self.ws.call(requests.GetInputAudioSyncOffset(inputName=source_name))
+        response = self._ws.call(requests.GetInputAudioSyncOffset(inputName=source_name))
         return response.datain.get("inputAudioSyncOffset", 0)
 
     async def set_audio_sync_offset(self, source_name: str, offset_ms: int) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.SetInputAudioSyncOffset(inputName=source_name, inputAudioSyncOffset=offset_ms))
+            self._ws.call(requests.SetInputAudioSyncOffset(inputName=source_name, inputAudioSyncOffset=offset_ms))
             self.logger.info(f"Set audio sync offset for {source_name} to {offset_ms}ms")
             return True
         except Exception as e:
@@ -102,14 +99,12 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def get_audio_tracks(self, source_name: str) -> Dict[str, bool]:
-        self._check_connection()
-        response = self.ws.call(requests.GetInputAudioTracks(inputName=source_name))
+        response = self._ws.call(requests.GetInputAudioTracks(inputName=source_name))
         return response.datain.get("inputAudioTracks", {})
 
     async def set_audio_tracks(self, source_name: str, tracks: Dict[str, bool]) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.SetInputAudioTracks(inputName=source_name, inputAudioTracks=tracks))
+            self._ws.call(requests.SetInputAudioTracks(inputName=source_name, inputAudioTracks=tracks))
             self.logger.info(f"Set audio tracks for {source_name}")
             return True
         except Exception as e:
@@ -117,14 +112,12 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def get_scene_item_transform(self, scene_name: str, item_id: int) -> Dict[str, Any]:
-        self._check_connection()
-        response = self.ws.call(requests.GetSceneItemTransform(sceneName=scene_name, sceneItemId=item_id))
+        response = self._ws.call(requests.GetSceneItemTransform(sceneName=scene_name, sceneItemId=item_id))
         return response.datain.get("sceneItemTransform", {})
 
     async def set_scene_item_transform(self, scene_name: str, item_id: int, transform: Dict[str, Any]) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(
+            self._ws.call(
                 requests.SetSceneItemTransform(sceneName=scene_name, sceneItemId=item_id, sceneItemTransform=transform)
             )
             self.logger.info(f"Set transform for scene item {item_id}")
@@ -134,14 +127,12 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def get_hotkey_list(self) -> List[str]:
-        self._check_connection()
-        response = self.ws.call(requests.GetHotkeyList())
+        response = self._ws.call(requests.GetHotkeyList())
         return response.datain.get("hotkeys", [])
 
     async def trigger_hotkey(self, hotkey_name: str) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.TriggerHotkeyByName(hotkeyName=hotkey_name))
+            self._ws.call(requests.TriggerHotkeyByName(hotkeyName=hotkey_name))
             self.logger.info(f"Triggered hotkey: {hotkey_name}")
             return True
         except Exception as e:
@@ -149,14 +140,12 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def get_virtual_cam_status(self) -> bool:
-        self._check_connection()
-        response = self.ws.call(requests.GetVirtualCamStatus())
+        response = self._ws.call(requests.GetVirtualCamStatus())
         return response.datain.get("outputActive", False)
 
     async def start_virtual_cam(self) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.StartVirtualCam())
+            self._ws.call(requests.StartVirtualCam())
             self.logger.info("Virtual camera started")
             return True
         except Exception as e:
@@ -164,9 +153,8 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def stop_virtual_cam(self) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.StopVirtualCam())
+            self._ws.call(requests.StopVirtualCam())
             self.logger.info("Virtual camera stopped")
             return True
         except Exception as e:
@@ -174,19 +162,16 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def toggle_virtual_cam(self) -> bool:
-        self._check_connection()
-        response = self.ws.call(requests.ToggleVirtualCam())
+        response = self._ws.call(requests.ToggleVirtualCam())
         return response.datain.get("outputActive", False)
 
     async def get_stream_service_settings(self) -> Dict[str, Any]:
-        self._check_connection()
-        response = self.ws.call(requests.GetStreamServiceSettings())
+        response = self._ws.call(requests.GetStreamServiceSettings())
         return response.datain.get("streamServiceSettings", {})
 
     async def set_stream_service_settings(self, settings: Dict[str, Any]) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(
+            self._ws.call(
                 requests.SetStreamServiceSettings(
                     streamServiceType=settings.get("service", "rtmp_common"), streamServiceSettings=settings
                 )
@@ -198,9 +183,8 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def pause_recording(self) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.PauseRecord())
+            self._ws.call(requests.PauseRecord())
             self.logger.info("Recording paused")
             return True
         except Exception as e:
@@ -208,9 +192,8 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def resume_recording(self) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.ResumeRecord())
+            self._ws.call(requests.ResumeRecord())
             self.logger.info("Recording resumed")
             return True
         except Exception as e:
@@ -218,19 +201,16 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def toggle_recording_pause(self) -> bool:
-        self._check_connection()
-        response = self.ws.call(requests.ToggleRecordPause())
+        response = self._ws.call(requests.ToggleRecordPause())
         return response.datain.get("outputPaused", False)
 
     async def get_replay_buffer_status(self) -> bool:
-        self._check_connection()
-        response = self.ws.call(requests.GetReplayBufferStatus())
+        response = self._ws.call(requests.GetReplayBufferStatus())
         return response.datain.get("outputActive", False)
 
     async def start_replay_buffer(self) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.StartReplayBuffer())
+            self._ws.call(requests.StartReplayBuffer())
             self.logger.info("Replay buffer started")
             return True
         except Exception as e:
@@ -238,9 +218,8 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def stop_replay_buffer(self) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.StopReplayBuffer())
+            self._ws.call(requests.StopReplayBuffer())
             self.logger.info("Replay buffer stopped")
             return True
         except Exception as e:
@@ -248,9 +227,8 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def save_replay_buffer(self) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.SaveReplayBuffer())
+            self._ws.call(requests.SaveReplayBuffer())
             self.logger.info("Replay buffer saved")
             return True
         except Exception as e:
@@ -258,14 +236,12 @@ class AdvancedOBSAgent(OBSAgent):
             return False
 
     async def get_output_settings(self, output_name: str) -> Dict[str, Any]:
-        self._check_connection()
-        response = self.ws.call(requests.GetOutputSettings(outputName=output_name))
+        response = self._ws.call(requests.GetOutputSettings(outputName=output_name))
         return response.datain.get("outputSettings", {})
 
     async def set_output_settings(self, output_name: str, settings: Dict[str, Any]) -> bool:
-        self._check_connection()
         try:
-            self.ws.call(requests.SetOutputSettings(outputName=output_name, outputSettings=settings))
+            self._ws.call(requests.SetOutputSettings(outputName=output_name, outputSettings=settings))
             self.logger.info(f"Updated output settings for {output_name}")
             return True
         except Exception as e:
@@ -401,7 +377,7 @@ class AdvancedOBSController:
 
     async def monitor_and_auto_adjust_audio(
         self, duration_seconds: int = 60, target_range: Tuple[float, float] = (-25.0, -15.0)
-    ):
+    ) -> None:
         end_time = datetime.now() + timedelta(seconds=duration_seconds)
 
         while datetime.now() < end_time:
@@ -432,9 +408,10 @@ class AdvancedOBSController:
             duration = clip.get("duration", 5)
             transition = clip.get("transition", "Cut")
 
-            await self.agent.set_transition(transition)
-            await self.agent.set_scene(scene)
-            await asyncio.sleep(duration)
+            if scene:  # Only set scene if it's provided
+                await self.agent.set_transition(transition)
+                await self.agent.set_scene(scene)
+                await asyncio.sleep(duration)
 
         output_path = await self.agent.stop_recording()
         return output_path

@@ -12,7 +12,7 @@ class OBSAgent:
         self.host = host
         self.port = port
         self.password = password
-        self.ws = None
+        self.ws: Optional[obsws] = None
         self.connected = False
         self.event_handlers: Dict[str, List[Callable]] = {}
 
