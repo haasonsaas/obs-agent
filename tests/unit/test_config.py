@@ -214,7 +214,14 @@ class TestConfig:
 
     def test_load_default(self, temp_dir):
         """Test loading default configuration."""
-        with patch("pathlib.Path.home", return_value=temp_dir):
+        # Mock the home directory at import time by patching the Config class
+        with patch('obs_agent.config.Path.home', return_value=temp_dir):
+            # Import Config fresh to get the patched home directory
+            from importlib import reload
+            import obs_agent.config
+            reload(obs_agent.config)
+            from obs_agent.config import Config
+            
             config = Config.load()
             assert config.config_dir == temp_dir / ".obs_agent"
             assert config.cache_dir == temp_dir / ".obs_agent" / "cache"

@@ -184,6 +184,10 @@ def handle_obs_error(error: Exception) -> OBSAgentError:
     error_str = str(error).lower()
     error_type = type(error).__name__
 
+    # Generic WebSocket error (check before connection to handle WebSocket-specific errors)
+    if error_type.endswith("Error") and "websocket" in error_type.lower():
+        return WebSocketError(f"WebSocket error: {error}", {"original_error": str(error)})
+
     # Connection errors
     if "connection" in error_str or "connect" in error_str:
         if "refused" in error_str:
@@ -260,10 +264,6 @@ def handle_obs_error(error: Exception) -> OBSAgentError:
     # Permission errors
     if "permission" in error_str or "access denied" in error_str:
         return PermissionError(f"Permission denied: {error}")
-
-    # Generic WebSocket error
-    if error_type.endswith("Error") and "websocket" in error_type.lower():
-        return WebSocketError(f"WebSocket error: {error}", {"original_error": str(error)})
 
     # Fallback to generic error
     return OBSAgentError(f"OBS error: {error}", {"original_error": str(error), "error_type": error_type})
