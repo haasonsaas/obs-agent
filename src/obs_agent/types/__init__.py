@@ -35,7 +35,6 @@ from .sources import (
     SourceKind,
     SourceSettings,
     TextSourceSettings,
-    VideoSourceSettings,
     WindowCaptureSettings,
 )
 
@@ -84,7 +83,6 @@ __all__ = [
     "AudioInputSettings",
     "TextSourceSettings",
     "ImageSourceSettings",
-    "VideoSourceSettings",
     "BrowserSourceSettings",
     # Generic types
     "T",
