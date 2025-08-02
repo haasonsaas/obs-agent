@@ -1,6 +1,6 @@
 """Base type definitions and common types used throughout OBS Agent."""
 
-from typing import Any, Dict, Generic, List, NewType, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, List, NewType, TypeVar, Union
 
 from typing_extensions import NotRequired, TypedDict
 
@@ -188,8 +188,8 @@ class Statistics(TypedDict):
 
 
 # Callback and handler types
-CallbackFunction = TypeVar("CallbackFunction", bound=callable)
-AsyncCallbackFunction = TypeVar("AsyncCallbackFunction", bound=callable)
+CallbackFunction = TypeVar("CallbackFunction", bound=Callable[..., Any])
+AsyncCallbackFunction = TypeVar("AsyncCallbackFunction", bound=Callable[..., Any])
 
 
 # Event filter types

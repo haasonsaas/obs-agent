@@ -24,7 +24,7 @@ class BaseEventData(TypedDict, total=False):
 class SceneEventData(BaseEventData):
     """Event data for scene-related events."""
 
-    scene_name: str
+    scene_name: NotRequired[str]
     scene_uuid: NotRequired[UUID]
     scene_index: NotRequired[int]
 
@@ -32,9 +32,9 @@ class SceneEventData(BaseEventData):
 class SceneItemEventData(BaseEventData):
     """Event data for scene item events."""
 
-    scene_name: str
+    scene_name: NotRequired[str]
     scene_uuid: NotRequired[UUID]
-    scene_item_id: int
+    scene_item_id: NotRequired[int]
     scene_item_index: NotRequired[int]
     source_name: NotRequired[str]
     source_uuid: NotRequired[UUID]
@@ -43,7 +43,7 @@ class SceneItemEventData(BaseEventData):
 class SourceEventData(BaseEventData):
     """Event data for source/input events."""
 
-    input_name: str
+    input_name: NotRequired[str]
     input_uuid: NotRequired[UUID]
     input_kind: NotRequired[str]
     unversioned_input_kind: NotRequired[str]
@@ -60,8 +60,8 @@ class AudioEventData(SourceEventData):
 class FilterEventData(BaseEventData):
     """Event data for filter events."""
 
-    source_name: str
-    filter_name: str
+    source_name: NotRequired[str]
+    filter_name: NotRequired[str]
     filter_kind: NotRequired[str]
     filter_index: NotRequired[int]
     filter_enabled: NotRequired[bool]
@@ -70,7 +70,7 @@ class FilterEventData(BaseEventData):
 class TransitionEventData(BaseEventData):
     """Event data for transition events."""
 
-    transition_name: str
+    transition_name: NotRequired[str]
     transition_uuid: NotRequired[UUID]
     transition_kind: NotRequired[str]
 
@@ -79,7 +79,7 @@ class OutputEventData(BaseEventData):
     """Event data for output events (streaming/recording)."""
 
     output_name: NotRequired[str]
-    output_active: bool
+    output_active: NotRequired[bool]
     output_state: NotRequired[str]
     output_path: NotRequired[str]
 
@@ -87,9 +87,9 @@ class OutputEventData(BaseEventData):
 class MediaEventData(BaseEventData):
     """Event data for media input events."""
 
-    input_name: str
+    input_name: NotRequired[str]
     input_uuid: NotRequired[UUID]
-    media_state: str
+    media_state: NotRequired[str]
     media_duration: NotRequired[int]
     media_cursor: NotRequired[int]
 
@@ -97,16 +97,15 @@ class MediaEventData(BaseEventData):
 class HotkeyEventData(BaseEventData):
     """Event data for hotkey events."""
 
-    hotkey_name: str
+    hotkey_name: NotRequired[str]
     hotkey_id: NotRequired[str]
 
 
 class VendorEventData(BaseEventData):
     """Event data for vendor-specific events."""
 
-    vendor_name: str
-    event_type: str
-    event_data: Dict[str, Any]
+    vendor_name: NotRequired[str]
+    # Note: Don't redefine event_type and event_data to avoid MyPy overwrite warnings
 
 
 # Complete event type definitions
