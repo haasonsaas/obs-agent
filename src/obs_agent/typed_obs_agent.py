@@ -7,14 +7,16 @@ type safety, validation, and better type inference for all operations.
 
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, AsyncContextManager, Dict, List, Literal, Optional, Union, overload
+from typing import Any, AsyncContextManager, AsyncIterator, Callable, Dict, List, Literal, Optional, Union, cast, overload
 
 from .config import Config
 from .obs_agent_v2 import OBSAgent as BaseOBSAgent
 from .types import (  # API Response types; Source types; Base types; Generic types; Event types
+    Bytes,
     CurrentProgramSceneChangedData,
     Decibels,
     InputMuteStateChangedData,
+    Milliseconds,
     OBSStats,
     OBSVersionInfo,
     RecordingStatus,
@@ -354,8 +356,8 @@ class TypedOBSAgent:
                 "output_active": ensure_type(status_data.get("is_recording", False), bool),
                 "output_paused": ensure_type(status_data.get("is_paused", False), bool),
                 "output_timecode": "00:00:00",  # Could be computed from duration
-                "output_duration": safe_cast(status_data.get("duration", 0), int) or 0,
-                "output_bytes": safe_cast(status_data.get("bytes", 0), int) or 0,
+                "output_duration": Milliseconds(status_data.get("duration", 0)),
+                "output_bytes": Bytes(status_data.get("bytes", 0)),
             }
             return TypedResult(True, recording_status)
         except Exception as e:
@@ -391,7 +393,9 @@ class TypedOBSAgent:
         """Register typed scene change handler."""
         from .event_handler import CurrentProgramSceneChanged
 
-        typed_handler = create_typed_handler(CurrentProgramSceneChanged, handler)
+        # Cast handler to match expected type
+        event_handler = cast(Callable[[CurrentProgramSceneChanged], None], handler)
+        typed_handler = create_typed_handler(CurrentProgramSceneChanged, event_handler)
 
         @self._agent.on(CurrentProgramSceneChanged)
         async def wrapper(event: CurrentProgramSceneChanged) -> None:
@@ -409,7 +413,9 @@ class TypedOBSAgent:
         """Register typed mute change handler."""
         from .event_handler import InputMuteStateChanged
 
-        typed_handler = create_typed_handler(InputMuteStateChanged, handler)
+        # Cast handler to match expected type
+        event_handler = cast(Callable[[InputMuteStateChanged], None], handler)
+        typed_handler = create_typed_handler(InputMuteStateChanged, event_handler)
 
         @self._agent.on(InputMuteStateChanged)
         async def wrapper(event: InputMuteStateChanged) -> None:
@@ -423,7 +429,7 @@ class TypedOBSAgent:
         return typed_handler
 
     # Validation methods
-    def validate_scene_name(self, scene_name: str) -> ValidationResult:
+    def validate_scene_name(self, scene_name: Any) -> ValidationResult:
         """Validate scene name."""
         if not isinstance(scene_name, str):
             return {"valid": False, "errors": ["Scene name must be a string"]}
@@ -433,7 +439,7 @@ class TypedOBSAgent:
             return {"valid": False, "errors": ["Scene name too long (max 256 characters)"]}
         return {"valid": True, "errors": []}
 
-    def validate_source_name(self, source_name: str) -> ValidationResult:
+    def validate_source_name(self, source_name: Any) -> ValidationResult:
         """Validate source name."""
         if not isinstance(source_name, str):
             return {"valid": False, "errors": ["Source name must be a string"]}
@@ -443,7 +449,7 @@ class TypedOBSAgent:
             return {"valid": False, "errors": ["Source name too long (max 256 characters)"]}
         return {"valid": True, "errors": []}
 
-    def validate_volume_db(self, volume_db: float) -> ValidationResult:
+    def validate_volume_db(self, volume_db: Any) -> ValidationResult:
         """Validate volume in decibels."""
         if not isinstance(volume_db, (int, float)):
             return {"valid": False, "errors": ["Volume must be a number"]}
@@ -454,7 +460,7 @@ class TypedOBSAgent:
 
 # Factory function for convenient creation
 @asynccontextmanager
-async def create_typed_obs_agent(config: Optional[Config] = None) -> AsyncContextManager[TypedOBSAgent]:
+async def create_typed_obs_agent(config: Optional[Config] = None) -> AsyncIterator[TypedOBSAgent]:
     """Create typed OBS agent with automatic connection management."""
     agent = TypedOBSAgent(config)
     try:

@@ -214,6 +214,7 @@ class ConnectionManager:
         if not self.is_connected:
             raise ConnectionError("Not connected to OBS")
 
+        assert self._connection is not None  # Checked by is_connected
         self._stats.total_requests += 1
 
         try:
@@ -333,13 +334,16 @@ class ConnectionManager:
         self._reconnecting = True
         self._reconnect_task = asyncio.current_task()
 
+        assert self._config is not None  # Set in connect()
         for attempt in range(1, self._config.max_reconnect_attempts + 1):
             if self._shutdown:
                 break
 
+            assert self._config is not None  # Set in connect()
             logger.info(f"Reconnection attempt {attempt}/{self._config.max_reconnect_attempts}")
 
             try:
+                assert self._config is not None  # Set in connect()
                 await asyncio.sleep(self._config.reconnect_interval)
                 await self.connect(self._config)
                 self._stats.reconnect_count += 1
@@ -348,6 +352,7 @@ class ConnectionManager:
             except Exception as e:
                 logger.warning(f"Reconnection attempt {attempt} failed: {e}")
 
+                assert self._config is not None  # Set in connect()
                 if attempt == self._config.max_reconnect_attempts:
                     logger.error("Max reconnection attempts reached")
                     self._stats.last_error = "Max reconnection attempts reached"

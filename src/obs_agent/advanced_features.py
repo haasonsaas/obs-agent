@@ -19,7 +19,8 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_filters(self, source_name: str) -> List[Dict[str, Any]]:
         response = self._ws.call(requests.GetSourceFilterList(sourceName=source_name))
-        return response.datain.get("filters", [])
+        filters = response.datain.get("filters", [])
+        return list(filters) if filters else []
 
     async def add_filter(
         self, source_name: str, filter_name: str, filter_kind: str, filter_settings: Dict[str, Any]
@@ -61,7 +62,7 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_audio_monitor_type(self, source_name: str) -> str:
         response = self._ws.call(requests.GetInputAudioMonitorType(inputName=source_name))
-        return response.datain.get("monitorType", "")
+        return str(response.datain.get("monitorType", ""))
 
     async def set_audio_monitor_type(self, source_name: str, monitor_type: str) -> bool:
         try:
@@ -74,7 +75,7 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_audio_balance(self, source_name: str) -> float:
         response = self._ws.call(requests.GetInputAudioBalance(inputName=source_name))
-        return response.datain.get("inputAudioBalance", 0.5)
+        return float(response.datain.get("inputAudioBalance", 0.5))
 
     async def set_audio_balance(self, source_name: str, balance: float) -> bool:
         try:
@@ -87,7 +88,7 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_audio_sync_offset(self, source_name: str) -> int:
         response = self._ws.call(requests.GetInputAudioSyncOffset(inputName=source_name))
-        return response.datain.get("inputAudioSyncOffset", 0)
+        return int(response.datain.get("inputAudioSyncOffset", 0))
 
     async def set_audio_sync_offset(self, source_name: str, offset_ms: int) -> bool:
         try:
@@ -100,7 +101,8 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_audio_tracks(self, source_name: str) -> Dict[str, bool]:
         response = self._ws.call(requests.GetInputAudioTracks(inputName=source_name))
-        return response.datain.get("inputAudioTracks", {})
+        tracks = response.datain.get("inputAudioTracks", {})
+        return dict(tracks) if tracks else {}
 
     async def set_audio_tracks(self, source_name: str, tracks: Dict[str, bool]) -> bool:
         try:
@@ -113,7 +115,8 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_scene_item_transform(self, scene_name: str, item_id: int) -> Dict[str, Any]:
         response = self._ws.call(requests.GetSceneItemTransform(sceneName=scene_name, sceneItemId=item_id))
-        return response.datain.get("sceneItemTransform", {})
+        transform = response.datain.get("sceneItemTransform", {})
+        return dict(transform) if transform else {}
 
     async def set_scene_item_transform(self, scene_name: str, item_id: int, transform: Dict[str, Any]) -> bool:
         try:
@@ -128,7 +131,8 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_hotkey_list(self) -> List[str]:
         response = self._ws.call(requests.GetHotkeyList())
-        return response.datain.get("hotkeys", [])
+        hotkeys = response.datain.get("hotkeys", [])
+        return list(hotkeys) if hotkeys else []
 
     async def trigger_hotkey(self, hotkey_name: str) -> bool:
         try:
@@ -141,7 +145,7 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_virtual_cam_status(self) -> bool:
         response = self._ws.call(requests.GetVirtualCamStatus())
-        return response.datain.get("outputActive", False)
+        return bool(response.datain.get("outputActive", False))
 
     async def start_virtual_cam(self) -> bool:
         try:
@@ -163,11 +167,12 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def toggle_virtual_cam(self) -> bool:
         response = self._ws.call(requests.ToggleVirtualCam())
-        return response.datain.get("outputActive", False)
+        return bool(response.datain.get("outputActive", False))
 
     async def get_stream_service_settings(self) -> Dict[str, Any]:
         response = self._ws.call(requests.GetStreamServiceSettings())
-        return response.datain.get("streamServiceSettings", {})
+        settings = response.datain.get("streamServiceSettings", {})
+        return dict(settings) if settings else {}
 
     async def set_stream_service_settings(self, settings: Dict[str, Any]) -> bool:
         try:
@@ -202,7 +207,7 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def toggle_recording_pause(self) -> bool:
         response = self._ws.call(requests.ToggleRecordPause())
-        return response.datain.get("outputPaused", False)
+        return bool(response.datain.get("outputPaused", False))
 
     async def get_replay_buffer_status(self) -> bool:
         response = self._ws.call(requests.GetReplayBufferStatus())
@@ -237,7 +242,8 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_output_settings(self, output_name: str) -> Dict[str, Any]:
         response = self._ws.call(requests.GetOutputSettings(outputName=output_name))
-        return response.datain.get("outputSettings", {})
+        settings = response.datain.get("outputSettings", {})
+        return dict(settings) if settings else {}
 
     async def set_output_settings(self, output_name: str, settings: Dict[str, Any]) -> bool:
         try:

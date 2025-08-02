@@ -269,11 +269,11 @@ try:
         """Complete Pydantic model for OBS Agent configuration."""
 
         obs: OBSConnectionConfigModel
-        logging: LoggingConfigModel = Field(default_factory=lambda: LoggingConfigModel())
-        streaming: StreamingConfigModel = Field(default_factory=lambda: StreamingConfigModel())
-        recording: RecordingConfigModel = Field(default_factory=lambda: RecordingConfigModel())
-        automation: AutomationConfigModel = Field(default_factory=lambda: AutomationConfigModel())
-        security: SecurityConfigModel = Field(default_factory=lambda: SecurityConfigModel())
+        logging: LoggingConfigModel = Field(default_factory=LoggingConfigModel)  # type: ignore[arg-type]
+        streaming: StreamingConfigModel = Field(default_factory=StreamingConfigModel)  # type: ignore[arg-type]
+        recording: RecordingConfigModel = Field(default_factory=RecordingConfigModel)  # type: ignore[arg-type]
+        automation: AutomationConfigModel = Field(default_factory=AutomationConfigModel)  # type: ignore[arg-type]
+        security: SecurityConfigModel = Field(default_factory=SecurityConfigModel)  # type: ignore[arg-type]
 
         class Config:
             extra = "forbid"  # Don't allow extra fields
