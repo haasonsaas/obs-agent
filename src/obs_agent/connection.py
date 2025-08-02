@@ -237,7 +237,8 @@ class ConnectionManager:
 
         except obswebsocket.exceptions.MessageTimeout:
             self._stats.failed_requests += 1
-            raise RequestTimeoutError(type(request).__name__, timeout or self._config.timeout)
+            timeout_value = timeout if timeout is not None else (self._config.timeout if self._config else 30.0)
+            raise RequestTimeoutError(type(request).__name__, timeout_value)
         except Exception as e:
             self._stats.failed_requests += 1
             self._stats.last_error = str(e)
@@ -300,6 +301,7 @@ class ConnectionManager:
     def _handle_connection_error(self, error: Exception) -> None:
         """Handle connection errors."""
         error_str = str(error).lower()
+        assert self._config is not None  # Set in connect()
 
         if "auth" in error_str or "password" in error_str:
             raise AuthenticationError("Authentication failed. Check your OBS WebSocket password.")
@@ -337,7 +339,7 @@ class ConnectionManager:
         assert self._config is not None  # Set in connect()
         for attempt in range(1, self._config.max_reconnect_attempts + 1):
             if self._shutdown:
-                break
+                break  # type: ignore[unreachable]
 
             assert self._config is not None  # Set in connect()
             logger.info(f"Reconnection attempt {attempt}/{self._config.max_reconnect_attempts}")

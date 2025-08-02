@@ -211,7 +211,7 @@ class AdvancedOBSAgent(OBSAgent):
 
     async def get_replay_buffer_status(self) -> bool:
         response = self._ws.call(requests.GetReplayBufferStatus())
-        return response.datain.get("outputActive", False)
+        return bool(response.datain.get("outputActive", False))
 
     async def start_replay_buffer(self) -> bool:
         try:

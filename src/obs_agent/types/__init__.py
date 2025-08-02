@@ -22,11 +22,20 @@ from .api_responses import (
 )
 
 # Import specific types to avoid F403/F405 flake8 errors
-from .base import UUID, Color, ConfigT, Duration, EventT, Font, P, Position, R, Scale, Size, T, Timestamp, Transform
+from .base import (
+    UUID, Bytes, Color, ConfigT, Decibels, Duration, EventT, Font, 
+    Frames, Milliseconds, P, Percentage, Position, R, Scale, Size, T, 
+    Timestamp, Transform, ValidationResult
+)
 from .config import AudioConfig
 from .config import OBSConnectionConfig as OBSConfig
 from .config import RecordingConfig, StreamingConfig, VideoConfig
-from .events import AudioEventData, EventData, OutputEventData, SceneEventData, SourceEventData
+from .events import (
+    AudioEventData, CurrentProgramSceneChangedData, EventData, 
+    InputMuteStateChangedData, OutputEventData, SceneEventData, 
+    SourceEventData
+)
+from .generics import TypedCache, TypedResult
 from .sources import (
     AudioInputSettings,
     BrowserSourceSettings,
@@ -43,12 +52,18 @@ __all__ = [
     "UUID",
     "Timestamp",
     "Duration",
+    "Bytes",
+    "Milliseconds",
+    "Frames",
+    "Percentage",
+    "Decibels",
     "Position",
     "Scale",
     "Transform",
     "Size",
     "Color",
     "Font",
+    "ValidationResult",
     # API Response types
     "OBSVersionInfo",
     "OBSStats",
@@ -75,6 +90,8 @@ __all__ = [
     "SourceEventData",
     "AudioEventData",
     "OutputEventData",
+    "CurrentProgramSceneChangedData",
+    "InputMuteStateChangedData",
     # Source types
     "SourceKind",
     "SourceSettings",
@@ -90,4 +107,6 @@ __all__ = [
     "R",
     "EventT",
     "ConfigT",
+    "TypedCache",
+    "TypedResult",
 ]

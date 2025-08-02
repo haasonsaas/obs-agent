@@ -296,7 +296,7 @@ def safe_cast(value: Any, target_type: Type[T]) -> Optional[T]:
         if isinstance(value, target_type):
             return value
         # Try to cast/convert the value
-        return cast(T, target_type(value))  # type: ignore[call-arg]
+        return target_type(value)  # type: ignore[call-arg]
     except (TypeError, ValueError):
         return None
 

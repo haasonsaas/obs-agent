@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from typing_extensions import NotRequired, TypedDict
 
-from .base import BaseConfig
+from .base import BaseConfig, Timestamp
 
 
 # Configuration TypedDicts
@@ -271,9 +271,9 @@ try:
         obs: OBSConnectionConfigModel
         logging: LoggingConfigModel = Field(default_factory=LoggingConfigModel)  # type: ignore[arg-type]
         streaming: StreamingConfigModel = Field(default_factory=StreamingConfigModel)  # type: ignore[arg-type]
-        recording: RecordingConfigModel = Field(default_factory=RecordingConfigModel)  # type: ignore[arg-type]
+        recording: RecordingConfigModel = Field(default_factory=RecordingConfigModel)
         automation: AutomationConfigModel = Field(default_factory=AutomationConfigModel)  # type: ignore[arg-type]
-        security: SecurityConfigModel = Field(default_factory=SecurityConfigModel)  # type: ignore[arg-type]
+        security: SecurityConfigModel = Field(default_factory=SecurityConfigModel)
 
         class Config:
             extra = "forbid"  # Don't allow extra fields
@@ -369,7 +369,7 @@ DEFAULT_PERFORMANCE_CONFIG: PerformanceConfig = {
 
 DEFAULT_OBS_AGENT_CONFIG: OBSAgentConfig = {
     "version": "2.0.0",
-    "created_at": datetime.now().timestamp(),
+    "created_at": Timestamp(datetime.now().timestamp()),
     "obs": DEFAULT_OBS_CONFIG,
     "logging": DEFAULT_LOGGING_CONFIG,
     "streaming": DEFAULT_STREAMING_CONFIG,
@@ -392,8 +392,7 @@ def validate_config(config: Dict[str, Any]) -> Union[OBSAgentConfig, Dict[str, s
         Validated configuration or validation errors
     """
     if ValidatedOBSAgentConfig is None:
-        # Basic validation without Pydantic
-        errors = {}
+        errors = {}  # type: ignore[unreachable]  # Basic validation without Pydantic
 
         # Check required fields
         if "obs" not in config:

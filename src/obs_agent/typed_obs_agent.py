@@ -27,10 +27,12 @@ from .types import (  # API Response types; Source types; Base types; Generic ty
     Bytes,
     CurrentProgramSceneChangedData,
     Decibels,
+    Frames,
     InputMuteStateChangedData,
     Milliseconds,
     OBSStats,
     OBSVersionInfo,
+    Percentage,
     RecordingStatus,
     SourceInfo,
     SourceKind,
@@ -38,6 +40,7 @@ from .types import (  # API Response types; Source types; Base types; Generic ty
     StreamStatus,
     TypedCache,
     TypedResult,
+    UUID,
     ValidationResult,
     VolumeInfo,
 )
@@ -66,7 +69,7 @@ class TypedOBSAgent:
         """Initialize typed OBS Agent."""
         self._agent = BaseOBSAgent(config)
         self._scene_cache: TypedCache[str] = TypedCache(str)
-        self._source_cache: TypedCache[SourceInfo] = TypedCache(dict)  # type: ignore
+        self._source_cache: TypedCache[Dict[str, Any]] = TypedCache(dict)
         self._validators: Dict[str, TypedValidator[Any]] = {}
         self._setup_validators()
 
@@ -130,20 +133,18 @@ class TypedOBSAgent:
         try:
             data = await self._agent.get_stats()
             stats: OBSStats = {
-                "cpu_usage": safe_cast(data.get("cpuUsage", 0), float) or 0.0,
-                "memory_usage": safe_cast(data.get("memoryUsage", 0), int) or 0,
-                "available_disk_space": safe_cast(data.get("availableDiskSpace", 0), int) or 0,
-                "active_fps": safe_cast(data.get("activeFps", 0), float) or 0.0,
-                "average_frame_time": safe_cast(data.get("averageFrameTime", 0), float) or 0.0,
-                "render_total_frames": safe_cast(data.get("renderTotalFrames", 0), int) or 0,
-                "render_missed_frames": safe_cast(data.get("renderMissedFrames", 0), int) or 0,
-                "render_skipped_frames": safe_cast(data.get("renderSkippedFrames", 0), int) or 0,
-                "output_total_frames": safe_cast(data.get("outputTotalFrames", 0), int) or 0,
-                "output_skipped_frames": safe_cast(data.get("outputSkippedFrames", 0), int) or 0,
-                "web_socket_session_incoming_messages": safe_cast(data.get("webSocketSessionIncomingMessages", 0), int)
-                or 0,
-                "web_socket_session_outgoing_messages": safe_cast(data.get("webSocketSessionOutgoingMessages", 0), int)
-                or 0,
+                "cpu_usage": Percentage(data.get("cpuUsage", 0.0)),
+                "memory_usage": Bytes(data.get("memoryUsage", 0)),
+                "available_disk_space": Bytes(data.get("availableDiskSpace", 0)),
+                "active_fps": float(data.get("activeFps", 0.0)),
+                "average_frame_time": float(data.get("averageFrameTime", 0.0)),
+                "render_total_frames": Frames(data.get("renderTotalFrames", 0)),
+                "render_missed_frames": Frames(data.get("renderMissedFrames", 0)),
+                "render_skipped_frames": Frames(data.get("renderSkippedFrames", 0)),
+                "output_total_frames": Frames(data.get("outputTotalFrames", 0)),
+                "output_skipped_frames": Frames(data.get("outputSkippedFrames", 0)),
+                "web_socket_session_incoming_messages": int(data.get("webSocketSessionIncomingMessages", 0)),
+                "web_socket_session_outgoing_messages": int(data.get("webSocketSessionOutgoingMessages", 0)),
             }
             return TypedResult(True, stats)
         except Exception as e:
@@ -210,7 +211,7 @@ class TypedOBSAgent:
             for source in sources:
                 validated_source: SourceInfo = {
                     "input_name": ensure_type(source.get("inputName", ""), str),
-                    "input_uuid": ensure_type(source.get("inputUuid", ""), str),
+                    "input_uuid": UUID(ensure_type(source.get("inputUuid", ""), str)),
                     "input_kind": ensure_type(source.get("inputKind", ""), str),
                     "unversioned_input_kind": ensure_type(source.get("unversionedInputKind", ""), str),
                 }
@@ -236,12 +237,10 @@ class TypedOBSAgent:
             return TypedResult(False, error="Invalid source name")
 
         try:
-            # Use the underlying agent's create_source method
-            # Note: This assumes the base agent has this method
-            result = await self._agent.create_source(
-                scene_name=scene_name, source_name=source_name, source_kind=source_kind, settings=source_settings or {}
-            )
-            return TypedResult(True, ensure_type(result, int))
+            # The base agent doesn't have a create_source method
+            # This would need to be implemented using raw OBS WebSocket requests
+            # For now, return a not implemented error
+            return TypedResult(False, error="create_source not implemented in base agent")
         except Exception as e:
             return TypedResult(False, error=str(e))
 
@@ -255,7 +254,7 @@ class TypedOBSAgent:
             volume_data = await self._agent.get_source_volume(source_name)
             volume_info: VolumeInfo = {
                 "input_volume_mul": ensure_type(volume_data.get("volume_mul", 1.0), float),
-                "input_volume_db": ensure_type(volume_data.get("volume_db", 0.0), float),
+                "input_volume_db": Decibels(ensure_type(volume_data.get("volume_db", 0.0), float)),
             }
             return TypedResult(True, volume_info)
         except Exception as e:
@@ -333,11 +332,11 @@ class TypedOBSAgent:
                 "output_active": ensure_type(status_data.get("is_streaming", False), bool),
                 "output_reconnecting": False,  # Not available in base agent
                 "output_timecode": "00:00:00",  # Could be computed from duration
-                "output_duration": safe_cast(status_data.get("duration", 0), int) or 0,
+                "output_duration": Milliseconds(safe_cast(status_data.get("duration", 0), int) or 0),
                 "output_congestion": 0.0,  # Not available in base agent
-                "output_bytes": safe_cast(status_data.get("bytes", 0), int) or 0,
-                "output_skipped_frames": safe_cast(status_data.get("skipped_frames", 0), int) or 0,
-                "output_total_frames": safe_cast(status_data.get("total_frames", 0), int) or 0,
+                "output_bytes": Bytes(safe_cast(status_data.get("bytes", 0), int) or 0),
+                "output_skipped_frames": Frames(safe_cast(status_data.get("skipped_frames", 0), int) or 0),
+                "output_total_frames": Frames(safe_cast(status_data.get("total_frames", 0), int) or 0),
             }
             return TypedResult(True, stream_status)
         except Exception as e:
@@ -405,17 +404,16 @@ class TypedOBSAgent:
         """Register typed scene change handler."""
         from .event_handler import CurrentProgramSceneChanged
 
-        # Cast handler to match expected type
-        event_handler = cast(Callable[[CurrentProgramSceneChanged], None], handler)
-        typed_handler = create_typed_handler(CurrentProgramSceneChanged, event_handler)
+        # Create typed handler for the data type
+        typed_handler = create_typed_handler(CurrentProgramSceneChangedData, handler)  # type: ignore[arg-type]
 
         @self._agent.on(CurrentProgramSceneChanged)
         async def wrapper(event: CurrentProgramSceneChanged) -> None:
             event_data: CurrentProgramSceneChangedData = {
                 "scene_name": event.scene_name,
-                "scene_uuid": event.scene_uuid or "",
+                "scene_uuid": UUID(event.scene_uuid or ""),
             }
-            await typed_handler.handle(event_data)
+            await handler(event_data)  # Call the handler directly with the data
 
         return typed_handler
 
@@ -425,18 +423,17 @@ class TypedOBSAgent:
         """Register typed mute change handler."""
         from .event_handler import InputMuteStateChanged
 
-        # Cast handler to match expected type
-        event_handler = cast(Callable[[InputMuteStateChanged], None], handler)
-        typed_handler = create_typed_handler(InputMuteStateChanged, event_handler)
+        # Create typed handler for the data type
+        typed_handler = create_typed_handler(InputMuteStateChangedData, handler)  # type: ignore[arg-type]
 
         @self._agent.on(InputMuteStateChanged)
         async def wrapper(event: InputMuteStateChanged) -> None:
             event_data: InputMuteStateChangedData = {
                 "input_name": event.input_name,
-                "input_uuid": event.input_uuid or "",
+                "input_uuid": UUID(event.input_uuid or ""),
                 "input_muted": event.input_muted,
             }
-            await typed_handler.handle(event_data)
+            await handler(event_data)  # Call the handler directly with the data
 
         return typed_handler
 

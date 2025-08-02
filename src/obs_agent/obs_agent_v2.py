@@ -8,7 +8,7 @@ for controlling OBS Studio via WebSocket.
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, TypedDict, Union
+from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, TypedDict, Union, cast
 
 from obswebsocket import requests
 
@@ -196,7 +196,7 @@ class OBSAgent:
             Dictionary with performance stats
         """
         response = await self.connection.execute(requests.GetStats())
-        return response.datain
+        return dict(response.datain) if response.datain else {}
 
     # Scene Methods
 
@@ -233,7 +233,7 @@ class OBSAgent:
             Current scene name
         """
         response = await self.connection.execute(requests.GetCurrentProgramScene())
-        return response.datain.get("currentProgramSceneName", "")
+        return str(response.datain.get("currentProgramSceneName", ""))
 
     @log_performance
     async def set_scene(self, scene_name: str) -> bool:
@@ -339,12 +339,13 @@ class OBSAgent:
 
         response = await self.connection.execute(requests.GetInputList())
         sources = response.datain.get("inputs", [])
+        sources_list = list(sources) if sources else []
 
         # Update cache
-        self._source_cache = sources
+        self._source_cache = sources_list
         self._cache_timestamp = datetime.now()
 
-        return sources
+        return sources_list
 
     @log_performance
     async def get_source_settings(self, source_name: str) -> Dict[str, Any]:
@@ -417,8 +418,7 @@ class OBSAgent:
         source_name = validate_source_name(source_name)
 
         response = await self.connection.execute(requests.GetInputMute(inputName=source_name))
-
-        return response.datain.get("inputMuted", False)
+        return bool(response.datain.get("inputMuted", False))
 
     @log_performance
     async def set_source_mute(self, source_name: str, muted: bool) -> bool:
@@ -467,7 +467,7 @@ class OBSAgent:
         new_status = response.datain.get("inputMuted", False)
         self.logger.info(f"Toggled mute for {source_name}, now: {new_status}")
 
-        return new_status
+        return bool(new_status)
 
     @log_performance
     async def get_source_volume(self, source_name: str) -> VolumeInfo:
@@ -588,7 +588,7 @@ class OBSAgent:
         is_active = response.datain.get("outputActive", False)
 
         log_stream_status(is_active)
-        return is_active
+        return bool(is_active)
 
     @log_performance
     async def get_streaming_status(self) -> StreamStatus:
@@ -651,7 +651,7 @@ class OBSAgent:
         output_path = response.datain.get("outputPath", "")
 
         log_recording_status(False, output_path)
-        return output_path
+        return str(output_path)
 
     @log_performance
     async def toggle_recording(self) -> Dict[str, Any]:
@@ -860,7 +860,7 @@ class OBSAgent:
             async def scene_changed(event: CurrentProgramSceneChanged):
                 print(f"Scene changed to: {event.scene_name}")
         """
-        return self.events.on(event_type, *filters)
+        return cast(Callable, self.events.on(event_type, *filters))
 
     async def wait_for_event(self, event_type: Union[str, type], timeout: float = 30.0) -> Optional[Any]:
         """
