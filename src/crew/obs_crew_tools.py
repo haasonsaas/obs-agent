@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any, Dict, Optional, Type
 
-from advanced_features import AdvancedOBSAgent
+from ..obs_agent.advanced_features import AdvancedOBSAgent
 from crewai_tools import BaseTool
 from pydantic import BaseModel, Field
 
