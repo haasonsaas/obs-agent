@@ -24,6 +24,7 @@ from typing import (
 from .config import Config
 from .obs_agent_v2 import OBSAgent as BaseOBSAgent
 from .types import (  # API Response types; Source types; Base types; Generic types; Event types
+    UUID,
     Bytes,
     CurrentProgramSceneChangedData,
     Decibels,
@@ -40,7 +41,6 @@ from .types import (  # API Response types; Source types; Base types; Generic ty
     StreamStatus,
     TypedCache,
     TypedResult,
-    UUID,
     ValidationResult,
     VolumeInfo,
 )
