@@ -188,7 +188,7 @@ try:
     class LoggingConfigModel(BaseModel):
         """Pydantic model for logging configuration."""
 
-        level: str = Field("INFO", regex=r"^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$")
+        level: str = Field("INFO", pattern=r"^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$")
         format: Optional[str] = None
         file_path: Optional[str] = None
         max_file_size: PositiveInt = 10 * 1024 * 1024  # 10MB
@@ -205,7 +205,7 @@ try:
         video_bitrate: PositiveInt = 2500
         audio_bitrate: PositiveInt = 160
         fps: PositiveInt = Field(30, le=60)
-        resolution: str = Field("1920x1080", regex=r"^\d+x\d+$")
+        resolution: str = Field("1920x1080", pattern=r"^\d+x\d+$")
         encoder: str = "x264"
         preset: str = "veryfast"
         profile: str = "main"
