@@ -217,9 +217,9 @@ class EventSourcingSystem:
                                 return {"error": self.error}
 
                             @classmethod
-                            def from_event_data(cls, data: Dict[str, Any], **kwargs):
+                            def from_event_data(cls, aggregate_id: str, metadata: EventMetadata, data: Dict[str, Any]):
                                 """Deserialize from event data."""
-                                return cls(error=data["error"], **kwargs)
+                                return cls(aggregate_id=aggregate_id, metadata=metadata, error=data["error"])
 
                         failed_event = AutomationRuleFailed(
                             aggregate_id=f"rule:{rule.id}",
