@@ -459,6 +459,17 @@ class AutomationRuleExecuted(DomainEvent):
         )
 
 
+# Import chat intelligence events
+try:
+    from ..chat_intelligence import (
+        ChatMessageReceived,
+        ChatAnalysisCompleted, 
+        EngagementMomentDetected
+    )
+    _chat_events_available = True
+except ImportError:
+    _chat_events_available = False
+
 # Event class mapping for deserialization
 EVENT_CLASS_MAP: Dict[EventType, Type[DomainEvent]] = {
     EventType.SCENE_CREATED: SceneCreated,
@@ -470,3 +481,11 @@ EVENT_CLASS_MAP: Dict[EventType, Type[DomainEvent]] = {
     EventType.AUTOMATION_RULE_TRIGGERED: AutomationRuleTriggered,
     EventType.AUTOMATION_RULE_EXECUTED: AutomationRuleExecuted,
 }
+
+# Add chat intelligence events if available
+if _chat_events_available:
+    EVENT_CLASS_MAP.update({
+        EventType.CHAT_MESSAGE_RECEIVED: ChatMessageReceived,
+        EventType.CHAT_ANALYSIS_COMPLETED: ChatAnalysisCompleted,
+        EventType.CHAT_ENGAGEMENT_MOMENT: EngagementMomentDetected,
+    })
