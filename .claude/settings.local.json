@@ -33,7 +33,14 @@
       "mcp__filesystem__read_file",
       "Bash(mypy:*)",
       "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python3 -m pytest tests/unit/test_config.py::test_load_default -xvs)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_config.py::test_load_default -xvs)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_config.py --collect-only)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_config.py::TestConfig::test_load_default -xvs)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/test_exceptions.py::TestHandleOBSError::test_handle_websocket_errors -xvs)",
+      "Bash(mv:*)",
+      "Bash(PYTHONPATH=/Users/jonathanhaas/obs_agent/src python -m pytest tests/unit/ -q)"
     ],
     "deny": []
   }
