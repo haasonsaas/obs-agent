@@ -215,7 +215,7 @@ class EventSourcingSystem:
 
                             def get_event_data(self) -> Dict[str, Any]:
                                 return {"error": self.error}
-                            
+
                             @classmethod
                             def from_event_data(cls, data: Dict[str, Any], **kwargs):
                                 """Deserialize from event data."""
