@@ -478,11 +478,13 @@ class TestTimeTravelDebugger:
 
     def test_step_forward_backward(self, debugger_setup):
         """Test stepping through events."""
+        import time
         event_store, debugger = debugger_setup
 
-        # Add events
+        # Add events with small delays to ensure unique timestamps
         for i in range(3):
             event_store.append(SceneCreated(aggregate_id=f"scene:{i}", scene_name=f"Scene {i}"))
+            time.sleep(0.001)  # 1ms delay to ensure unique timestamps on all platforms
 
         session = debugger.start_session()
 
